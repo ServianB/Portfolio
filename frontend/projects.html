@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tous les projets - Benjamin Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#f0f9ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        'secondary': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-white text-secondary-800" x-data="allProjectsPage()">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-secondary-200 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-primary-600">
+                    <a href="/">Benjamin<span class="text-secondary-400">.</span></a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Filter Dropdown -->
+                    <select x-model="selectedCategory" @change="filterProjects()" 
+                            class="px-3 py-1 text-sm border border-secondary-300 rounded-md focus:ring-2 focus:ring-primary-500">
+                        <option value="">Toutes les catégories</option>
+                        <option value="Web">Web</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Desktop">Desktop</option>
+                        <option value="API">API</option>
+                        <option value="Dashboard">Dashboard</option>
+                        <option value="E-commerce">E-commerce</option>
+                    </select>
+                    
+                    <button @click="toggleLanguage()" 
+                            class="px-3 py-1 text-sm border border-secondary-300 rounded-md hover:bg-secondary-50 transition-colors">
+                        <span x-text="currentLang.toUpperCase()"></span>
+                    </button>
+                    <a href="/" class="text-secondary-600 hover:text-primary-600 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        <span x-text="currentLang === 'fr' ? 'Retour' : 'Back'"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Projects Header -->
+    <section class="pt-24 pb-12 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4" 
+                x-text="currentLang === 'fr' ? 'Tous mes projets' : 'All my projects'"></h1>
+            <p class="text-xl text-primary-100" 
+               x-text="currentLang === 'fr' ? 'Découvrez l\\'ensemble de mes réalisations professionnelles et académiques' : 'Discover all my professional and academic achievements'"></p>
+        </div>
+    </section>
+
+    <!-- Projects Grid -->
+    <section class="py-16 bg-secondary-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
+                    <div class="text-3xl font-bold text-primary-600" x-text="projects.length"></div>
+                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets au total' : 'Total projects'"></div>
+                </div>
+                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
+                    <div class="text-3xl font-bold text-green-600" x-text="featuredCount"></div>
+                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets mis en avant' : 'Featured projects'"></div>
+                </div>
+                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
+                    <div class="text-3xl font-bold text-purple-600" x-text="filteredProjects.length"></div>
+                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets affichés' : 'Displayed projects'"></div>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="mb-8 flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" x-model="searchTerm" @input="filterProjects()"
+                           :placeholder="currentLang === 'fr' ? 'Rechercher un projet...' : 'Search a project...'"
+                           class="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+                <button @click="loadProjects()" 
+                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                    <i class="fas fa-refresh mr-2"></i>
+                    <span x-text="currentLang === 'fr' ? 'Actualiser' : 'Refresh'"></span>
+                </button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="all-projects-container">
+                <template x-for="project in filteredProjects" :key="project.id">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative">
+                            <template x-if="project.image_url">
+                                <img :src="project.image_url" :alt="currentLang === 'fr' ? project.title_fr : project.title_en" 
+                                     class="w-full h-48 object-cover">
+                            </template>
+                            <template x-if="!project.image_url">
+                                <div class="w-full h-48 bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                                    <i class="fas fa-code text-4xl text-white"></i>
+                                </div>
+                            </template>
+                            <div class="absolute top-4 right-4 space-x-2">
+                                <span class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                                      x-text="project.category || 'Web'"></span>
+                                <template x-if="project.featured">
+                                    <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-secondary-800 mb-3" 
+                                x-text="currentLang === 'fr' ? project.title_fr : project.title_en"></h3>
+                            <p class="text-secondary-600 mb-4 line-clamp-3" 
+                               x-text="currentLang === 'fr' ? project.description_fr : project.description_en"></p>
+                            
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <template x-for="tech in (project.technologies || '').split(',').slice(0, 3)" :key="tech">
+                                    <span class="bg-secondary-100 text-secondary-700 px-2 py-1 rounded-md text-sm" 
+                                          x-text="tech.trim()"></span>
+                                </template>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <a :href="'/project/' + project.id" 
+                                   class="text-primary-600 hover:text-primary-700 font-medium">
+                                    <span x-text="currentLang === 'fr' ? 'Voir le projet' : 'View project'"></span> →
+                                </a>
+                                <div class="space-x-2">
+                                    <template x-if="project.github_url">
+                                        <a :href="project.github_url" target="_blank" 
+                                           class="text-secondary-400 hover:text-secondary-600">
+                                            <i class="fab fa-github text-lg"></i>
+                                        </a>
+                                    </template>
+                                    <template x-if="project.live_url">
+                                        <a :href="project.live_url" target="_blank" 
+                                           class="text-secondary-400 hover:text-secondary-600">
+                                            <i class="fas fa-external-link-alt text-lg"></i>
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- No projects message -->
+            <div x-show="filteredProjects.length === 0" class="text-center py-12">
+                <i class="fas fa-search text-6xl text-secondary-300 mb-4"></i>
+                <h3 class="text-2xl font-semibold text-secondary-600 mb-2" 
+                    x-text="currentLang === 'fr' ? 'Aucun projet trouvé' : 'No projects found'"></h3>
+                <p class="text-secondary-500" 
+                   x-text="currentLang === 'fr' ? 'Essayez avec d\\'autres mots-clés ou filtres' : 'Try with other keywords or filters'"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-secondary-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-secondary-400">
+                &copy; <span x-text="new Date().getFullYear()"></span> Benjamin. 
+                <span x-text="currentLang === 'fr' ? 'Tous droits réservés.' : 'All rights reserved.'"></span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function allProjectsPage() {
+            return {
+                currentLang: localStorage.getItem('preferred-language') || 'fr',
+                projects: [],
+                filteredProjects: [],
+                searchTerm: '',
+                selectedCategory: '',
+                featuredCount: 0,
+
+                init() {
+                    this.loadProjects();
+                },
+
+                async loadProjects() {
+                    try {
+                        const response = await fetch('/api/projects');
+                        const data = await response.json();
+                        this.projects = data.projects || [];
+                        this.featuredCount = this.projects.filter(p => p.featured).length;
+                        this.filterProjects();
+                    } catch (error) {
+                        console.error('Erreur lors du chargement des projets:', error);
+                    }
+                },
+
+                filterProjects() {
+                    let filtered = this.projects;
+
+                    // Filter by category
+                    if (this.selectedCategory) {
+                        filtered = filtered.filter(project => project.category === this.selectedCategory);
+                    }
+
+                    // Filter by search term
+                    if (this.searchTerm) {
+                        const term = this.searchTerm.toLowerCase();
+                        filtered = filtered.filter(project => {
+                            const titleFr = (project.title_fr || '').toLowerCase();
+                            const titleEn = (project.title_en || '').toLowerCase();
+                            const descFr = (project.description_fr || '').toLowerCase();
+                            const descEn = (project.description_en || '').toLowerCase();
+                            const tech = (project.technologies || '').toLowerCase();
+                            
+                            return titleFr.includes(term) || titleEn.includes(term) || 
+                                   descFr.includes(term) || descEn.includes(term) || 
+                                   tech.includes(term);
+                        });
+                    }
+
+                    this.filteredProjects = filtered;
+                },
+
+                toggleLanguage() {
+                    this.currentLang = this.currentLang === 'fr' ? 'en' : 'fr';
+                    localStorage.setItem('preferred-language', this.currentLang);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</body>
+</html>

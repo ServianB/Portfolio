@@ -1,0 +1,345 @@
+// Admin Panel JavaScript
+function adminPanel() {
+    return {
+        authenticated: false,
+        activeTab: 'projects',
+        
+        // Login data
+        credentials: {
+            username: '',
+            password: ''
+        },
+        loginError: '',
+        
+        // Projects data
+        projects: [],
+        editingProject: null,
+        
+        // Project form
+        projectForm: {
+            id: null,
+            title_fr: '',
+            title_en: '',
+            description_fr: '',
+            description_en: '',
+            technologies: '',
+            github_url: '',
+            live_url: '',
+            category: '',
+            featured: false
+        },
+        
+        // Messages
+        message: '',
+        messageType: 'success',
+        
+        // File upload
+        selectedFile: null,
+
+        // Initialization
+        init() {
+            // Check if already authenticated (simple session check)
+            const authToken = sessionStorage.getItem('admin_auth');
+            if (authToken) {
+                this.authenticated = true;
+                this.loadProjects();
+            }
+        },
+
+        // Authentication
+        async login() {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.credentials)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.authenticated = true;
+                    this.loginError = '';
+                    sessionStorage.setItem('admin_auth', 'authenticated');
+                    this.loadProjects();
+                    this.showMessage('Connexion réussie !', 'success');
+                } else {
+                    this.loginError = data.error || 'Erreur de connexion';
+                }
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                this.loginError = 'Erreur de connexion au serveur';
+            }
+        },
+
+        logout() {
+            this.authenticated = false;
+            sessionStorage.removeItem('admin_auth');
+            this.credentials = { username: '', password: '' };
+            this.showMessage('Déconnexion réussie', 'success');
+        },
+
+        // Projects management
+        async loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                const data = await response.json();
+                this.projects = data.projects || [];
+            } catch (error) {
+                console.error('Erreur lors du chargement des projets:', error);
+                this.showMessage('Erreur lors du chargement des projets', 'error');
+            }
+        },
+
+        async saveProject() {
+            try {
+                const formData = new FormData();
+                
+                // Add all form fields
+                Object.keys(this.projectForm).forEach(key => {
+                    if (key !== 'id' && this.projectForm[key] !== null) {
+                        // Gestion spéciale pour les booléens
+                        if (key === 'featured') {
+                            formData.append(key, this.projectForm[key] ? '1' : '0');
+                        } else {
+                            formData.append(key, this.projectForm[key]);
+                        }
+                    }
+                });
+
+                // Add file if selected
+                if (this.selectedFile) {
+                    formData.append('image', this.selectedFile);
+                }
+
+                const url = this.editingProject ? 
+                    `/api/projects/${this.editingProject.id}` : 
+                    '/api/projects';
+                
+                const method = this.editingProject ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.showMessage(
+                        this.editingProject ? 
+                        'Projet mis à jour avec succès !' : 
+                        'Projet créé avec succès !', 
+                        'success'
+                    );
+                    this.resetForm();
+                    this.loadProjects();
+                    this.activeTab = 'projects';
+                } else {
+                    this.showMessage(data.error || 'Erreur lors de la sauvegarde', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                this.showMessage('Erreur lors de la sauvegarde du projet', 'error');
+            }
+        },
+
+        editProject(project) {
+            this.editingProject = project;
+            this.projectForm = {
+                id: project.id,
+                title_fr: project.title_fr,
+                title_en: project.title_en,
+                description_fr: project.description_fr,
+                description_en: project.description_en,
+                technologies: project.technologies,
+                github_url: project.github_url || '',
+                live_url: project.live_url || '',
+                category: project.category,
+                featured: Boolean(project.featured)
+            };
+            this.activeTab = 'add-project';
+            this.selectedFile = null;
+        },
+
+        async deleteProject(projectId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.showMessage('Projet supprimé avec succès !', 'success');
+                    this.loadProjects();
+                } else {
+                    this.showMessage(data.error || 'Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                this.showMessage('Erreur lors de la suppression du projet', 'error');
+            }
+        },
+
+        resetForm() {
+            this.editingProject = null;
+            this.projectForm = {
+                id: null,
+                title_fr: '',
+                title_en: '',
+                description_fr: '',
+                description_en: '',
+                technologies: '',
+                github_url: '',
+                live_url: '',
+                category: '',
+                featured: false
+            };
+            this.selectedFile = null;
+            
+            // Reset file input
+            const fileInput = document.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+        },
+
+        handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    this.showMessage('Type de fichier non supporté. Utilisez JPG, PNG ou WebP.', 'error');
+                    event.target.value = '';
+                    return;
+                }
+
+                // Validate file size (5MB max)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    this.showMessage('Le fichier est trop volumineux. Taille maximale : 5MB.', 'error');
+                    event.target.value = '';
+                    return;
+                }
+
+                this.selectedFile = file;
+            }
+        },
+
+        // Utility functions
+        showMessage(text, type = 'success') {
+            this.message = text;
+            this.messageType = type;
+            
+            setTimeout(() => {
+                this.message = '';
+            }, 5000);
+        },
+
+        formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+    }
+}
+
+// Initialize admin panel when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        /* Custom scrollbar */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Form styling improvements */
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+        }
+        
+        /* Loading state for buttons */
+        .loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Animation for table rows */
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                // This would be handled by Alpine.js in the component
+            }
+        });
+    });
+});
+
+// Export for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { adminPanel };
+}
