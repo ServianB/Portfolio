@@ -265,59 +265,70 @@ function horizontalPortfolio() {
                 return;
             }
 
-            container.innerHTML = this.projects.map((project, index) => `
-                <div class="project-card bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group"
-                     style="animation-delay: ${index * 0.1}s">
-                    <div class="relative overflow-hidden">
-                        ${project.image_url ? `
-                            <img src="${project.image_url}" 
-                                 alt="${project.title}" 
-                                 class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        ` : `
-                            <div class="w-full h-48 bg-gradient-accent flex items-center justify-center">
-                                <i class="fas fa-code text-4xl text-white"></i>
+            container.innerHTML = this.projects.map((project, index) => {
+                // Gestion de la langue pour le titre et la description
+                const title = this.currentLang === 'fr' ? 
+                    (project.title_fr || project.title || 'Projet sans titre') : 
+                    (project.title_en || project.title || 'Untitled Project');
+                
+                const description = this.currentLang === 'fr' ? 
+                    (project.description_fr || project.description || 'Description du projet...') : 
+                    (project.description_en || project.description || 'Project description...');
+
+                return `
+                    <div class="project-card bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group"
+                         style="animation-delay: ${index * 0.1}s">
+                        <div class="relative overflow-hidden">
+                            ${project.image_url ? `
+                                <img src="${project.image_url}" 
+                                     alt="${title}" 
+                                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                            ` : `
+                                <div class="w-full h-48 bg-gradient-accent flex items-center justify-center">
+                                    <i class="fas fa-code text-4xl text-white"></i>
+                                </div>
+                            `}
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-primary-700">
+                                    ${project.category || (this.currentLang === 'fr' ? 'Projet' : 'Project')}
+                                </span>
                             </div>
-                        `}
-                        <div class="absolute top-4 right-4">
-                            <span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-primary-700">
-                                ${project.category || (this.currentLang === 'fr' ? 'Projet' : 'Project')}
-                            </span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary-900 mb-3 group-hover:text-accent-600 transition-colors">
+                                ${title}
+                            </h3>
+                            <p class="text-primary-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                ${description}
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex space-x-3">
+                                    ${project.live_url ? `
+                                        <a href="${project.live_url}" 
+                                           target="_blank" 
+                                           class="flex items-center text-accent-600 hover:text-accent-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-external-link-alt mr-1"></i>
+                                            ${this.currentLang === 'fr' ? 'Démo' : 'Demo'}
+                                        </a>
+                                    ` : ''}
+                                    ${project.github_url ? `
+                                        <a href="${project.github_url}" 
+                                           target="_blank" 
+                                           class="flex items-center text-primary-600 hover:text-primary-700 transition-colors text-sm font-medium">
+                                            <i class="fab fa-github mr-1"></i>
+                                            Code
+                                        </a>
+                                    ` : ''}
+                                </div>
+                                <a href="/project.html?id=${project.id}"
+                                   class="text-primary-500 hover:text-accent-600 transition-colors">
+                                    <i class="fas fa-arrow-right text-lg"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-primary-900 mb-3 group-hover:text-accent-600 transition-colors">
-                            ${project.title}
-                        </h3>
-                        <p class="text-primary-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                            ${project.description || (this.currentLang === 'fr' ? 'Description du projet...' : 'Project description...')}
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex space-x-3">
-                                ${project.demo_url ? `
-                                    <a href="${project.demo_url}" 
-                                       target="_blank" 
-                                       class="flex items-center text-accent-600 hover:text-accent-700 transition-colors text-sm font-medium">
-                                        <i class="fas fa-external-link-alt mr-1"></i>
-                                        ${this.currentLang === 'fr' ? 'Démo' : 'Demo'}
-                                    </a>
-                                ` : ''}
-                                ${project.github_url ? `
-                                    <a href="${project.github_url}" 
-                                       target="_blank" 
-                                       class="flex items-center text-primary-600 hover:text-primary-700 transition-colors text-sm font-medium">
-                                        <i class="fab fa-github mr-1"></i>
-                                        Code
-                                    </a>
-                                ` : ''}
-                            </div>
-                            <button onclick="showProjectModal('${project.id}')"
-                                    class="text-primary-500 hover:text-accent-600 transition-colors">
-                                <i class="fas fa-arrow-right text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         },
 
         // Projets de démonstration si l'API ne répond pas
@@ -384,10 +395,11 @@ function horizontalPortfolio() {
     }
 }
 
-// Fonction pour afficher la modale d'un projet (à implémenter)
+// Fonction pour afficher la modale d'un projet ou rediriger vers la page détail
 function showProjectModal(projectId) {
     console.log('Affichage du projet:', projectId);
-    // Ici vous pouvez implémenter une modale pour afficher les détails du projet
+    // Rediriger vers la page de détail du projet
+    window.location.href = `/project.html?id=${projectId}`;
 }
 
 // Gestion de l'URL au chargement
@@ -407,11 +419,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hash && sectionMap.hasOwnProperty(hash)) {
         // Attendre que Alpine.js soit initialisé
         setTimeout(() => {
-            const portfolioInstance = window.Alpine.store('portfolio');
-            if (portfolioInstance) {
-                portfolioInstance.goToSection(sectionMap[hash]);
+            // Chercher l'instance Alpine.js dans le DOM
+            const portfolioElement = document.querySelector('[x-data*="horizontalPortfolio"]');
+            if (portfolioElement && portfolioElement._x_dataStack) {
+                const portfolioInstance = portfolioElement._x_dataStack[0];
+                if (portfolioInstance && portfolioInstance.goToSection) {
+                    portfolioInstance.goToSection(sectionMap[hash]);
+                }
             }
-        }, 100);
+        }, 500);
     }
 });
 

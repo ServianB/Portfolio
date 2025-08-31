@@ -109,6 +109,13 @@
             transform: translateX(-50%);
             color: rgba(255, 255, 255, 0.7);
             animation: float 3s ease-in-out infinite;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .scroll-indicator i {
+            display: block;
+            margin: 0 auto 0.5rem auto;
         }
         
         /* Navigation dots */
@@ -273,8 +280,8 @@
     <div class="horizontal-container" :style="`transform: translateX(-${currentSection * 100}vw)`">
         
         <!-- Section 0: Landing Intro -->
-        <section class="section gradient-primary text-white">
-            <div class="text-center max-w-4xl mx-auto px-6">
+        <section class="section gradient-primary text-white relative">
+            <div class="flex flex-col justify-center items-center h-full text-center max-w-4xl mx-auto px-6">
                 <div class="animate-fade-in">
                     <h1 class="text-6xl md:text-8xl font-display font-bold mb-8">
                         Benjamin
@@ -283,16 +290,17 @@
                         <span x-text="currentLang === 'fr' ? 'Développeur IA & Web' : 'AI & Web Developer'"></span>
                     </p>
                     <button @click="goToSection(1)" 
-                            class="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium">
+                            class="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium mx-auto">
                         <span x-text="currentLang === 'fr' ? 'Commencer l&apos;exploration' : 'Start exploring'"></span>
                         <i class="fas fa-arrow-right ml-3"></i>
                     </button>
                 </div>
-                
-                <div class="scroll-indicator">
-                    <i class="fas fa-mouse text-2xl mb-2 block"></i>
-                    <p class="text-sm" x-text="currentLang === 'fr' ? 'Scroll pour naviguer' : 'Scroll to navigate'"></p>
-                </div>
+            </div>
+            
+            <!-- Scroll indicator - repositionné -->
+            <div class="scroll-indicator">
+                <i class="fas fa-mouse text-2xl mb-2"></i>
+                <p class="text-sm" x-text="currentLang === 'fr' ? 'Scroll pour naviguer' : 'Scroll to navigate'"></p>
             </div>
         </section>
 
