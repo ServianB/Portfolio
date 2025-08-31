@@ -188,6 +188,42 @@
         .gradient-accent {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
+
+        /* Écriture verticale pour les réseaux sociaux */
+        .writing-vertical {
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+
+        /* Traits de séparation verticaux */
+        .vertical-separator {
+            width: 1px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            margin: 0 auto;
+        }
+
+        /* Version mobile des réseaux sociaux */
+        @media (max-width: 1024px) {
+            .social-links-mobile {
+                position: fixed;
+                bottom: 6rem;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 40;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 1.5rem;
+            }
+
+            .horizontal-separator {
+                width: 30px;
+                height: 1px;
+                background: rgba(255, 255, 255, 0.4);
+            }
+        }
     </style>
 </head>
 <<body class="font-inter bg-white text-primary-800" x-data="horizontalPortfolio()">
@@ -281,22 +317,66 @@
         
         <!-- Section 0: Landing Intro -->
         <section class="section gradient-primary text-white relative">
+            <!-- Réseaux sociaux - Positionnés à gauche verticalement -->
+            <div class="fixed left-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+                <div class="flex flex-col items-center space-y-8">
+                    <a href="https://linkedin.com/in/benjamin-servian" 
+                       target="_blank" 
+                       class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide writing-vertical">
+                        LinkedIn
+                    </a>
+                    <div class="vertical-separator"></div>
+                    <a href="https://github.com/ServianB" 
+                       target="_blank" 
+                       class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide writing-vertical">
+                        GitHub
+                    </a>
+                    <div class="vertical-separator"></div>
+                    <a href="https://instagram.com/benjamin.servian" 
+                       target="_blank" 
+                       class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide writing-vertical">
+                        Instagram
+                    </a>
+                </div>
+            </div>
+
             <div class="flex flex-col justify-center items-center h-full text-center max-w-4xl mx-auto px-6">
                 <div class="animate-fade-in">
                     <h1 class="text-6xl md:text-8xl font-display font-bold mb-8">
-                        Benjamin
+                        Benjamin Servian
                     </h1>
                     <p class="text-xl md:text-2xl font-light mb-12 opacity-90">
-                        <span x-text="currentLang === 'fr' ? 'Développeur IA & Web' : 'AI & Web Developer'"></span>
+                        <span x-text="currentLang === 'fr' ? 'Développeur Fullstack' : 'Fullstack Developer'"></span>
                     </p>
                     <button @click="goToSection(1)" 
-                            class="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium mx-auto">
-                        <span x-text="currentLang === 'fr' ? 'Commencer l&apos;exploration' : 'Start exploring'"></span>
+                            class="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium">
+                        <span x-text="currentLang === 'fr' ? 'Commencer l\'exploration' : 'Start exploring'"></span>
                         <i class="fas fa-arrow-right ml-3"></i>
                     </button>
                 </div>
             </div>
             
+            <!-- Réseaux sociaux - Version mobile (horizontale en bas) -->
+            <div class="social-links-mobile lg:hidden">
+                <a href="https://linkedin.com/in/benjamin-servian" 
+                   target="_blank" 
+                   class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide">
+                    LinkedIn
+                </a>
+                <div class="horizontal-separator"></div>
+                <a href="https://github.com/ServianB" 
+                   target="_blank" 
+                   class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide">
+                    GitHub
+                </a>
+                <div class="horizontal-separator"></div>
+                <a href="https://instagram.com/benjamin.servian" 
+                   target="_blank" 
+                   class="text-white/70 hover:text-white transition-all duration-300 font-inter text-sm tracking-wide">
+                    Instagram
+                </a>
+            </div>
+
             <!-- Scroll indicator - repositionné -->
             <div class="scroll-indicator">
                 <i class="fas fa-mouse text-2xl mb-2"></i>
@@ -309,7 +389,7 @@
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="animate-slide-in-left">
                     <h2 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-6">
-                        <span x-text="currentLang === 'fr' ? 'Créateur d&apos;expériences' : 'Experience Creator'"></span>
+                        <span x-text="currentLang === 'fr' ? 'Créateur d\'expériences' : 'Experience Creator'"></span>
                     </h2>
                     <p class="text-xl md:text-2xl text-primary-600 mb-8 max-w-3xl mx-auto leading-relaxed">
                         <span x-text="currentLang === 'fr' ? 'Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.' : 'I transform ideas into innovative digital solutions, combining technical creativity and professional excellence.'"></span>
@@ -320,10 +400,10 @@
                                 <i class="fas fa-brain text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span x-text="currentLang === 'fr' ? 'Intelligence Artificielle' : 'Artificial Intelligence'"></span>
+                                <span x-text="currentLang === 'fr' ? 'Développement Web' : 'Web Development'"></span>
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span x-text="currentLang === 'fr' ? 'Solutions IA innovantes' : 'Innovative AI Solutions'"></span>
+                                <span x-text="currentLang === 'fr' ? 'Des sites pensés pour les clients' : 'Websites designed for clients'"></span>
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -331,10 +411,10 @@
                                 <i class="fas fa-code text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span x-text="currentLang === 'fr' ? 'Développement Web' : 'Web Development'"></span>
+                                <span x-text="currentLang === 'fr' ? 'Développement mobile' : 'Mobile Development'"></span>
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span x-text="currentLang === 'fr' ? 'Applications modernes' : 'Modern Applications'"></span>
+                                <span x-text="currentLang === 'fr' ? 'Solutions Android & IOS' : 'Android & IOS Solutions'"></span>
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -474,7 +554,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold mb-2">Email</h3>
-                                <p class="opacity-90">benjamin@portfolio.com</p>
+                                <p class="opacity-90">benjamin.servian.pro@gmail.com</p>
                             </div>
                         </div>
                         
@@ -484,7 +564,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold mb-2">LinkedIn</h3>
-                                <p class="opacity-90">/in/benjamin-portfolio</p>
+                                <p class="opacity-90">/in/benjamin-servian/</p>
                             </div>
                         </div>
                         
@@ -494,7 +574,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold mb-2">GitHub</h3>
-                                <p class="opacity-90">github.com/benjamin</p>
+                                <p class="opacity-90">github.com/ServianB</p>
                             </div>
                         </div>
                     </div>
@@ -534,6 +614,97 @@
             </div>
         </section>
     </div>
+
+    <!-- Script de débogage Alpine.js -->
+    <script>
+        // Portfolio JavaScript intégré pour éviter les problèmes de chargement
+        function horizontalPortfolio() {
+            return {
+                currentLang: localStorage.getItem('preferred-language') || 'fr',
+                mobileMenuOpen: false,
+                projects: [],
+                currentSection: 0,
+                totalSections: 5,
+                isScrolling: false,
+
+                // Initialisation
+                init() {
+                    console.log('Portfolio initialisé');
+                    this.setupHorizontalScroll();
+                    this.loadProjects();
+                },
+
+                // Navigation entre sections
+                goToSection(sectionIndex) {
+                    if (sectionIndex >= 0 && sectionIndex < this.totalSections) {
+                        this.currentSection = sectionIndex;
+                        console.log('Navigation vers section:', sectionIndex);
+                    }
+                },
+
+                // Basculer la langue
+                toggleLanguage() {
+                    this.currentLang = this.currentLang === 'fr' ? 'en' : 'fr';
+                    localStorage.setItem('preferred-language', this.currentLang);
+                    console.log('Langue changée vers:', this.currentLang);
+                },
+
+                // Configuration du scroll horizontal
+                setupHorizontalScroll() {
+                    let isScrolling = false;
+                    
+                    window.addEventListener('wheel', (e) => {
+                        if (isScrolling) return;
+                        e.preventDefault();
+                        
+                        const delta = e.deltaY || e.deltaX;
+                        
+                        if (delta > 0 && this.currentSection < this.totalSections - 1) {
+                            this.goToSection(this.currentSection + 1);
+                        } else if (delta < 0 && this.currentSection > 0) {
+                            this.goToSection(this.currentSection - 1);
+                        }
+                        
+                        isScrolling = true;
+                        setTimeout(() => { isScrolling = false; }, 800);
+                    }, { passive: false });
+                },
+
+                // Charger les projets
+                async loadProjects() {
+                    try {
+                        const response = await fetch('/api/projects?featured=true');
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.projects = data.projects || [];
+                            console.log('Projets chargés:', this.projects.length);
+                        }
+                    } catch (error) {
+                        console.error('Erreur chargement projets:', error);
+                        this.projects = [];
+                    }
+                },
+
+                // Soumettre le formulaire de contact
+                submitContact() {
+                    alert('Message envoyé !');
+                }
+            }
+        }
+
+        // Vérifier le chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            
+            setTimeout(() => {
+                if (window.Alpine) {
+                    console.log('Alpine.js chargé avec succès');
+                } else {
+                    console.error('Alpine.js non chargé');
+                }
+            }, 1000);
+        });
+    </script>
 
     <script src="js/main-horizontal.js"></script>
 </body>
