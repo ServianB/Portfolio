@@ -1,20 +1,165 @@
-// Portfolio JavaScript avec Alpine.js
-function portfolio() {
+// Portfolio JavaScript avec Alpine.js - Navigation Horizontale
+function horizontalPortfolio() {
     return {
         currentLang: localStorage.getItem('preferred-language') || 'fr',
-        scrolled: false,
         mobileMenuOpen: false,
         projects: [],
+        currentSection: 0,
+        totalSections: 5,
+        isScrolling: false,
+        scrollTimeout: null,
 
         // Initialisation
         init() {
             this.loadProjects();
-            this.setupScrollAnimations();
+            this.setupHorizontalScroll();
+            this.setupKeyboardNavigation();
+            this.setupTouchNavigation();
+        },
+
+        // Configuration du scroll horizontal avec la molette
+        setupHorizontalScroll() {
+            let isScrolling = false;
             
-            // Gestion du scroll pour la navigation
-            window.addEventListener('scroll', () => {
-                this.scrolled = window.scrollY > 50;
+            // Écouter les événements de scroll de la molette
+            window.addEventListener('wheel', (e) => {
+                if (isScrolling) return;
+                
+                e.preventDefault();
+                
+                // Déterminer la direction du scroll
+                const delta = e.deltaY || e.deltaX;
+                
+                if (delta > 0 && this.currentSection < this.totalSections - 1) {
+                    // Scroll vers la droite (section suivante)
+                    this.goToSection(this.currentSection + 1);
+                } else if (delta < 0 && this.currentSection > 0) {
+                    // Scroll vers la gauche (section précédente)
+                    this.goToSection(this.currentSection - 1);
+                }
+                
+                // Empêcher les scrolls trop rapides
+                isScrolling = true;
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 800);
+            }, { passive: false });
+            
+            // Empêcher le scroll vertical par défaut
+            document.body.style.overflow = 'hidden';
+        },
+
+        // Navigation par clavier
+        setupKeyboardNavigation() {
+            window.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowRight':
+                    case ' ': // Espace
+                        e.preventDefault();
+                        if (this.currentSection < this.totalSections - 1) {
+                            this.goToSection(this.currentSection + 1);
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        if (this.currentSection > 0) {
+                            this.goToSection(this.currentSection - 1);
+                        }
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        this.goToSection(0);
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        this.goToSection(this.totalSections - 1);
+                        break;
+                }
             });
+        },
+
+        // Navigation tactile pour mobile
+        setupTouchNavigation() {
+            let startX = 0;
+            let startY = 0;
+            let isTouch = false;
+
+            window.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isTouch = true;
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!isTouch) return;
+                e.preventDefault();
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => {
+                if (!isTouch) return;
+                
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = startX - endX;
+                const diffY = startY - endY;
+
+                // Vérifier si c'est un swipe horizontal
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                    if (diffX > 0 && this.currentSection < this.totalSections - 1) {
+                        // Swipe vers la gauche = section suivante
+                        this.goToSection(this.currentSection + 1);
+                    } else if (diffX < 0 && this.currentSection > 0) {
+                        // Swipe vers la droite = section précédente
+                        this.goToSection(this.currentSection - 1);
+                    }
+                }
+                
+                isTouch = false;
+            });
+        },
+
+        // Aller à une section spécifique
+        goToSection(sectionIndex) {
+            if (sectionIndex >= 0 && sectionIndex < this.totalSections && sectionIndex !== this.currentSection) {
+                this.currentSection = sectionIndex;
+                this.animateToSection();
+                this.triggerSectionAnimations();
+            }
+        },
+
+        // Animation vers la section
+        animateToSection() {
+            const container = document.querySelector('.horizontal-container');
+            if (container) {
+                // Mise à jour via Alpine.js réactive
+                this.$nextTick(() => {
+                    // Déclencher les animations d'entrée des éléments
+                    this.triggerSectionAnimations();
+                });
+            }
+        },
+
+        // Déclencher les animations spécifiques à chaque section
+        triggerSectionAnimations() {
+            // Réinitialiser toutes les animations
+            const animatedElements = document.querySelectorAll('.animate-fade-in, .animate-slide-in-left, .animate-slide-in-right');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+            });
+
+            // Délai pour permettre à la section d'être visible
+            setTimeout(() => {
+                const currentSectionElements = document.querySelectorAll(`.section:nth-child(${this.currentSection + 1}) .animate-fade-in, .section:nth-child(${this.currentSection + 1}) .animate-slide-in-left, .section:nth-child(${this.currentSection + 1}) .animate-slide-in-right`);
+                
+                currentSectionElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                        el.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    }, index * 100);
+                });
+            }, 100);
         },
 
         // Basculer la langue

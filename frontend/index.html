@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr" class="overflow-hidden">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benjamin - Portfolio IT</title>
     <meta name="description" content="Portfolio de Benjamin - Développeur Full Stack, spécialisé en technologies modernes">
-    <!-- Tailwind CSS via CDN - pour développement uniquement -->
+    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         'inter': ['Inter', 'sans-serif'],
+                        'display': ['Playfair Display', 'serif'],
                     },
                     colors: {
                         'primary': {
-                            50: '#f0f9ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        },
-                        'secondary': {
                             50: '#f8fafc',
                             100: '#f1f5f9',
                             200: '#e2e8f0',
@@ -35,72 +32,195 @@
                             700: '#334155',
                             800: '#1e293b',
                             900: '#0f172a',
+                        },
+                        'accent': {
+                            50: '#fef7ff',
+                            100: '#fceeff',
+                            200: '#f5d9ff',
+                            300: '#ecb8ff',
+                            400: '#de87ff',
+                            500: '#d055ff',
+                            600: '#c233f7',
+                            700: '#a71de3',
+                            800: '#8a19bb',
+                            900: '#741b98',
                         }
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'float': 'float 3s ease-in-out infinite',
+                        'fade-in': 'fadeIn 1s ease-out',
+                        'slide-in-left': 'slideInLeft 0.8s ease-out',
+                        'slide-in-right': 'slideInRight 0.8s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
                     }
                 }
             }
         }
     </script>
     <style>
+        /* Custom styles for horizontal scrolling */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        
+        .horizontal-container {
+            display: flex;
+            width: 500vw; /* 5 sections × 100vw */
+            height: 100vh;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .section {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Custom animations */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-20px); }
         }
-        .gradient-bg {
+        
+        /* Smooth scroll indicators */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Navigation dots */
+        .nav-dots {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-dot.active {
+            background: #d055ff;
+            transform: scale(1.2);
+        }
+        
+        /* Project cards hover effects */
+        .project-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .horizontal-container {
+                flex-direction: column;
+                width: 100vw;
+                height: 500vh;
+            }
+            
+            .section {
+                width: 100vw;
+                height: 100vh;
+            }
+            
+            .nav-dots {
+                bottom: 2rem;
+                right: 50%;
+                top: auto;
+                transform: translateX(50%);
+                flex-direction: row;
+            }
+        }
+        
+        /* Custom gradient backgrounds */
+        .gradient-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
     </style>
 </head>
-<body class="font-inter bg-white text-secondary-800" x-data="portfolio()">
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-secondary-200 z-50 transition-all duration-300" 
-         :class="{'shadow-lg': scrolled}" 
-         x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 50 })">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<<body class="font-inter bg-white text-primary-800" x-data="horizontalPortfolio()">
+    <!-- Fixed Navigation Bar -->
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-primary-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="text-2xl font-bold text-primary-600">
-                    Benjamin<span class="text-secondary-400">.</span>
+                <!-- Logo -->
+                <div class="text-2xl font-display font-bold text-primary-900">
+                    Benjamin<span class="text-accent-500">.</span>
                 </div>
                 
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="#accueil" class="nav-link text-secondary-600 hover:text-primary-600 transition-colors">
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-12">
+                    <button @click="goToSection(0)" :class="currentSection === 0 ? 'text-accent-500' : 'text-primary-600'"
+                            class="hover:text-accent-500 transition-colors font-medium">
+                        <span x-text="currentLang === 'fr' ? 'Intro' : 'Intro'"></span>
+                    </button>
+                    <button @click="goToSection(1)" :class="currentSection === 1 ? 'text-accent-500' : 'text-primary-600'"
+                            class="hover:text-accent-500 transition-colors font-medium">
                         <span x-text="currentLang === 'fr' ? 'Accueil' : 'Home'"></span>
-                    </a>
-                    <a href="#apropos" class="nav-link text-secondary-600 hover:text-primary-600 transition-colors">
+                    </button>
+                    <button @click="goToSection(2)" :class="currentSection === 2 ? 'text-accent-500' : 'text-primary-600'"
+                            class="hover:text-accent-500 transition-colors font-medium">
                         <span x-text="currentLang === 'fr' ? 'À propos' : 'About'"></span>
-                    </a>
-                    <a href="#projets" class="nav-link text-secondary-600 hover:text-primary-600 transition-colors">
+                    </button>
+                    <button @click="goToSection(3)" :class="currentSection === 3 ? 'text-accent-500' : 'text-primary-600'"
+                            class="hover:text-accent-500 transition-colors font-medium">
                         <span x-text="currentLang === 'fr' ? 'Projets' : 'Projects'"></span>
-                    </a>
-                    <a href="#contact" class="nav-link text-secondary-600 hover:text-primary-600 transition-colors">
+                    </button>
+                    <button @click="goToSection(4)" :class="currentSection === 4 ? 'text-accent-500' : 'text-primary-600'"
+                            class="hover:text-accent-500 transition-colors font-medium">
                         <span x-text="currentLang === 'fr' ? 'Contact' : 'Contact'"></span>
-                    </a>
+                    </button>
                 </div>
 
-                <!-- Language Toggle & Mobile Menu -->
-                <div class="flex items-center space-x-4">
-                    <button @click="toggleLanguage()" 
-                            class="px-3 py-1 text-sm border border-secondary-300 rounded-md hover:bg-secondary-50 transition-colors">
-                        <span x-text="currentLang.toUpperCase()"></span>
-                    </button>
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden">
-                        <i class="fas fa-bars text-secondary-600"></i>
-                    </button>
-                </div>
+                <!-- Mobile Menu Button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2">
+                    <i class="fas fa-bars text-primary-600 text-xl"></i>
+                </button>
             </div>
         </div>
 
@@ -112,213 +232,301 @@
              x-transition:leave="transition ease-in duration-75"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
-             class="md:hidden bg-white border-t border-secondary-200">
-            <div class="px-4 py-6 space-y-4">
-                <a href="#accueil" @click="mobileMenuOpen = false" class="block text-secondary-600 hover:text-primary-600">
+             class="md:hidden bg-white border-t border-primary-200 shadow-lg">
+            <div class="px-6 py-4 space-y-3">
+                <button @click="goToSection(0); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span x-text="currentLang === 'fr' ? 'Intro' : 'Intro'"></span>
+                </button>
+                <button @click="goToSection(1); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
                     <span x-text="currentLang === 'fr' ? 'Accueil' : 'Home'"></span>
-                </a>
-                <a href="#apropos" @click="mobileMenuOpen = false" class="block text-secondary-600 hover:text-primary-600">
+                </button>
+                <button @click="goToSection(2); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
                     <span x-text="currentLang === 'fr' ? 'À propos' : 'About'"></span>
-                </a>
-                <a href="#projets" @click="mobileMenuOpen = false" class="block text-secondary-600 hover:text-primary-600">
+                </button>
+                <button @click="goToSection(3); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
                     <span x-text="currentLang === 'fr' ? 'Projets' : 'Projects'"></span>
-                </a>
-                <a href="#contact" @click="mobileMenuOpen = false" class="block text-secondary-600 hover:text-primary-600">
+                </button>
+                <button @click="goToSection(4); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
                     <span x-text="currentLang === 'fr' ? 'Contact' : 'Contact'"></span>
-                </a>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="accueil" class="pt-20 pb-16 gradient-bg text-white min-h-screen flex items-center">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="animate-fade-in">
-                <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
-                    <span x-text="currentLang === 'fr' ? 'Benjamin' : 'Benjamin'"></span>
-                    <br>
-                    <span class="text-2xl md:text-4xl font-light text-blue-200" 
-                          x-text="currentLang === 'fr' ? 'Développeur Full Stack' : 'Full Stack Developer'"></span>
-                </h1>
-                <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.2s"
-                   x-text="currentLang === 'fr' ? 'Passionné par les technologies modernes et la création d&#39;expériences numériques innovantes' : 'Passionate about modern technologies and creating innovative digital experiences'"></p>
-                <div class="space-x-4 animate-slide-up" style="animation-delay: 0.4s">
-                    <a href="#projets" class="inline-block bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-                        <span x-text="currentLang === 'fr' ? 'Voir mes projets' : 'View my projects'"></span>
-                    </a>
-                    <a href="#contact" class="inline-block border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
-                        <span x-text="currentLang === 'fr' ? 'Me contacter' : 'Contact me'"></span>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Scroll indicator -->
-            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-float">
-                <i class="fas fa-chevron-down text-2xl text-white opacity-70"></i>
-            </div>
-        </div>
-    </section>
+    <!-- Language Toggle Button (Fixed Bottom Left) -->
+    <button @click="toggleLanguage()" 
+            class="fixed bottom-6 left-6 z-50 bg-white/90 backdrop-blur-md border border-primary-200 px-4 py-2 rounded-full hover:bg-accent-50 hover:border-accent-300 transition-all duration-300 shadow-lg font-medium">
+        <span x-text="currentLang.toUpperCase()"></span>
+        <i class="fas fa-globe ml-2 text-accent-500"></i>
+    </button>
 
-    <!-- About Section -->
-    <section id="apropos" class="py-20 bg-secondary-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-secondary-800 mb-4" 
-                    x-text="currentLang === 'fr' ? 'À propos de moi' : 'About me'"></h2>
-                <div class="w-24 h-1 bg-primary-500 mx-auto"></div>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6">
-                    <p class="text-lg text-secondary-600 leading-relaxed"
-                       x-text="currentLang === 'fr' ? 'Développeur passionné avec une expertise en technologies web modernes. Je me spécialise dans la création d&#39;applications web performantes et d&#39;expériences utilisateur exceptionnelles.' : 'Passionate developer with expertise in modern web technologies. I specialize in creating high-performance web applications and exceptional user experiences.'"></p>
-                    <p class="text-lg text-secondary-600 leading-relaxed"
-                       x-text="currentLang === 'fr' ? 'Mon approche combine créativité technique et rigueur professionnelle pour livrer des solutions innovantes qui répondent aux besoins réels des utilisateurs.' : 'My approach combines technical creativity and professional rigor to deliver innovative solutions that meet real user needs.'"></p>
-                    
-                    <!-- Skills -->
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-secondary-800 mb-4"
-                            x-text="currentLang === 'fr' ? 'Compétences techniques' : 'Technical skills'"></h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="skill-item">
-                                <span class="text-primary-600 font-medium">Frontend</span>
-                                <p class="text-sm text-secondary-500">React, Vue.js, Tailwind CSS</p>
-                            </div>
-                            <div class="skill-item">
-                                <span class="text-primary-600 font-medium">Backend</span>
-                                <p class="text-sm text-secondary-500">Node.js, Express, Python</p>
-                            </div>
-                            <div class="skill-item">
-                                <span class="text-primary-600 font-medium">Database</span>
-                                <p class="text-sm text-secondary-500">MongoDB, PostgreSQL, SQLite</p>
-                            </div>
-                            <div class="skill-item">
-                                <span class="text-primary-600 font-medium">DevOps</span>
-                                <p class="text-sm text-secondary-500">Docker, AWS, Git</p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Navigation Dots (Fixed Right) -->
+    <div class="nav-dots">
+        <div @click="goToSection(0)" :class="currentSection === 0 ? 'active' : ''" class="nav-dot"></div>
+        <div @click="goToSection(1)" :class="currentSection === 1 ? 'active' : ''" class="nav-dot"></div>
+        <div @click="goToSection(2)" :class="currentSection === 2 ? 'active' : ''" class="nav-dot"></div>
+        <div @click="goToSection(3)" :class="currentSection === 3 ? 'active' : ''" class="nav-dot"></div>
+        <div @click="goToSection(4)" :class="currentSection === 4 ? 'active' : ''" class="nav-dot"></div>
+    </div>
+
+    <!-- Main Horizontal Container -->
+    <div class="horizontal-container" :style="`transform: translateX(-${currentSection * 100}vw)`">
+        
+        <!-- Section 0: Landing Intro -->
+        <section class="section gradient-primary text-white">
+            <div class="text-center max-w-4xl mx-auto px-6">
+                <div class="animate-fade-in">
+                    <h1 class="text-6xl md:text-8xl font-display font-bold mb-8">
+                        Benjamin
+                    </h1>
+                    <p class="text-xl md:text-2xl font-light mb-12 opacity-90">
+                        <span x-text="currentLang === 'fr' ? 'Développeur IA & Web' : 'AI & Web Developer'"></span>
+                    </p>
+                    <button @click="goToSection(1)" 
+                            class="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium">
+                        <span x-text="currentLang === 'fr' ? 'Commencer l&apos;exploration' : 'Start exploring'"></span>
+                        <i class="fas fa-arrow-right ml-3"></i>
+                    </button>
                 </div>
                 
-                <div class="text-center">
-                    <div class="bg-white rounded-full w-80 h-80 mx-auto shadow-xl flex items-center justify-center">
-                        <i class="fas fa-user-tie text-8xl text-primary-500"></i>
+                <div class="scroll-indicator">
+                    <i class="fas fa-mouse text-2xl mb-2 block"></i>
+                    <p class="text-sm" x-text="currentLang === 'fr' ? 'Scroll pour naviguer' : 'Scroll to navigate'"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Home/Welcome -->
+        <section class="section bg-white">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <div class="animate-slide-in-left">
+                    <h2 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-6">
+                        <span x-text="currentLang === 'fr' ? 'Créateur d&apos;expériences' : 'Experience Creator'"></span>
+                    </h2>
+                    <p class="text-xl md:text-2xl text-primary-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                        <span x-text="currentLang === 'fr' ? 'Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.' : 'I transform ideas into innovative digital solutions, combining technical creativity and professional excellence.'"></span>
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-8 mt-12">
+                        <div class="text-center p-6">
+                            <div class="w-16 h-16 bg-gradient-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-brain text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-primary-800 mb-2">
+                                <span x-text="currentLang === 'fr' ? 'Intelligence Artificielle' : 'Artificial Intelligence'"></span>
+                            </h3>
+                            <p class="text-primary-600 text-sm">
+                                <span x-text="currentLang === 'fr' ? 'Solutions IA innovantes' : 'Innovative AI Solutions'"></span>
+                            </p>
+                        </div>
+                        <div class="text-center p-6">
+                            <div class="w-16 h-16 bg-gradient-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-code text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-primary-800 mb-2">
+                                <span x-text="currentLang === 'fr' ? 'Développement Web' : 'Web Development'"></span>
+                            </h3>
+                            <p class="text-primary-600 text-sm">
+                                <span x-text="currentLang === 'fr' ? 'Applications modernes' : 'Modern Applications'"></span>
+                            </p>
+                        </div>
+                        <div class="text-center p-6">
+                            <div class="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-rocket text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-primary-800 mb-2">
+                                <span x-text="currentLang === 'fr' ? 'Innovation' : 'Innovation'"></span>
+                            </h3>
+                            <p class="text-primary-600 text-sm">
+                                <span x-text="currentLang === 'fr' ? 'Technologies de pointe' : 'Cutting-edge Tech'"></span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Projects Section -->
-    <section id="projets" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-secondary-800 mb-4"
-                    x-text="currentLang === 'fr' ? 'Projets Mis en Avant' : 'Featured Projects'"></h2>
-                <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
-                <p class="text-lg text-secondary-600 max-w-2xl mx-auto"
-                   x-text="currentLang === 'fr' ? 'Découvrez une sélection de mes meilleurs projets professionnels et universitaires' : 'Discover a selection of my best professional and academic projects'"></p>
-            </div>
-
-            <!-- Featured Projects -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-container">
-                <!-- Projects will be loaded dynamically -->
-            </div>
-
-            <div class="text-center mt-12 space-x-4">
-                <a href="/projects" class="inline-block bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-colors text-lg font-semibold">
-                    <i class="fas fa-folder-open mr-2"></i>
-                    <span x-text="currentLang === 'fr' ? 'Voir tous les projets' : 'View all projects'"></span>
-                </a>
-                <button @click="loadProjects()" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                    <i class="fas fa-refresh mr-2"></i>
-                    <span x-text="currentLang === 'fr' ? 'Actualiser' : 'Refresh'"></span>
-                </button>
-                <a href="/admin" class="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors">
-                    <i class="fas fa-cog mr-2"></i>
-                    <span x-text="currentLang === 'fr' ? 'Administration' : 'Admin Panel'"></span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-secondary-900 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4"
-                    x-text="currentLang === 'fr' ? 'Contactez-moi' : 'Contact me'"></h2>
-                <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
-                <p class="text-lg text-secondary-300 max-w-2xl mx-auto"
-                   x-text="currentLang === 'fr' ? 'N&#39;hésitez pas à me contacter pour discuter de vos projets' : 'Feel free to contact me to discuss your projects'"></p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-12">
-                <div class="space-y-8">
-                    <div class="flex items-start space-x-4">
-                        <div class="bg-primary-600 p-3 rounded-lg">
-                            <i class="fas fa-envelope text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Email</h3>
-                            <p class="text-secondary-300">benjamin@portfolio.com</p>
+        <!-- Section 2: About -->
+        <section class="section bg-primary-50">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="animate-slide-in-left">
+                        <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
+                            <span x-text="currentLang === 'fr' ? 'À propos de moi' : 'About me'"></span>
+                        </h2>
+                        <p class="text-lg text-primary-700 mb-6 leading-relaxed">
+                            <span x-text="currentLang === 'fr' ? 'Développeur passionné avec une expertise en technologies web modernes et intelligence artificielle. Je me spécialise dans la création d&apos;applications performantes et d&apos;expériences utilisateur exceptionnelles.' : 'Passionate developer with expertise in modern web technologies and artificial intelligence. I specialize in creating high-performance applications and exceptional user experiences.'"></span>
+                        </p>
+                        <p class="text-lg text-primary-700 mb-8 leading-relaxed">
+                            <span x-text="currentLang === 'fr' ? 'Mon approche combine créativité technique et rigueur professionnelle pour livrer des solutions innovantes qui répondent aux besoins réels des utilisateurs.' : 'My approach combines technical creativity and professional rigor to deliver innovative solutions that meet real user needs.'"></span>
+                        </p>
+                        
+                        <!-- Skills Grid -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-3">
+                                    <i class="fab fa-react text-2xl text-blue-500 mr-3"></i>
+                                    <h3 class="font-semibold text-primary-800">Frontend</h3>
+                                </div>
+                                <p class="text-sm text-primary-600">React, Vue.js, Tailwind CSS</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-server text-2xl text-green-500 mr-3"></i>
+                                    <h3 class="font-semibold text-primary-800">Backend</h3>
+                                </div>
+                                <p class="text-sm text-primary-600">Node.js, Express, Python</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-database text-2xl text-purple-500 mr-3"></i>
+                                    <h3 class="font-semibold text-primary-800">Database</h3>
+                                </div>
+                                <p class="text-sm text-primary-600">MongoDB, PostgreSQL, SQLite</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-brain text-2xl text-accent-500 mr-3"></i>
+                                    <h3 class="font-semibold text-primary-800">AI/ML</h3>
+                                </div>
+                                <p class="text-sm text-primary-600">TensorFlow, PyTorch, OpenAI</p>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="flex items-start space-x-4">
-                        <div class="bg-primary-600 p-3 rounded-lg">
-                            <i class="fab fa-linkedin text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">LinkedIn</h3>
-                            <p class="text-secondary-300">/in/benjamin-portfolio</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start space-x-4">
-                        <div class="bg-primary-600 p-3 rounded-lg">
-                            <i class="fab fa-github text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">GitHub</h3>
-                            <p class="text-secondary-300">github.com/benjamin</p>
+                    <div class="animate-slide-in-right text-center lg:text-right">
+                        <div class="relative inline-block">
+                            <div class="w-80 h-80 bg-gradient-accent rounded-full flex items-center justify-center shadow-2xl">
+                                <i class="fas fa-user-tie text-8xl text-white"></i>
+                            </div>
+                            <div class="absolute -top-4 -right-4 w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center">
+                                <i class="fas fa-code text-2xl text-accent-500"></i>
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center">
+                                <i class="fas fa-lightbulb text-xl text-yellow-500"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <form class="space-y-6" @submit.prevent="submitContact()">
-                    <div>
-                        <label class="block text-sm font-medium mb-2" 
-                               x-text="currentLang === 'fr' ? 'Nom' : 'Name'"></label>
-                        <input type="text" class="w-full px-4 py-3 bg-secondary-800 border border-secondary-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Email</label>
-                        <input type="email" class="w-full px-4 py-3 bg-secondary-800 border border-secondary-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2" 
-                               x-text="currentLang === 'fr' ? 'Message' : 'Message'"></label>
-                        <textarea rows="4" class="w-full px-4 py-3 bg-secondary-800 border border-secondary-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors">
-                        <span x-text="currentLang === 'fr' ? 'Envoyer le message' : 'Send message'"></span>
+        <!-- Section 3: Projects -->
+        <section class="section bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
+                        <span x-text="currentLang === 'fr' ? 'Projets Mis en Avant' : 'Featured Projects'"></span>
+                    </h2>
+                    <p class="text-lg text-primary-600 max-w-2xl mx-auto">
+                        <span x-text="currentLang === 'fr' ? 'Découvrez une sélection de mes meilleurs projets professionnels et universitaires' : 'Discover a selection of my best professional and academic projects'"></span>
+                    </p>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-container">
+                    <!-- Projects will be loaded dynamically -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center mt-12 space-x-4 flex flex-wrap justify-center gap-4">
+                    <a href="/projects" class="inline-flex items-center bg-accent-500 text-white px-6 py-3 rounded-full hover:bg-accent-600 transition-colors font-medium">
+                        <i class="fas fa-folder-open mr-2"></i>
+                        <span x-text="currentLang === 'fr' ? 'Tous les projets' : 'All projects'"></span>
+                    </a>
+                    <button @click="loadProjects()" class="inline-flex items-center bg-primary-600 text-white px-6 py-3 rounded-full hover:bg-primary-700 transition-colors font-medium">
+                        <i class="fas fa-refresh mr-2"></i>
+                        <span x-text="currentLang === 'fr' ? 'Actualiser' : 'Refresh'"></span>
                     </button>
-                </form>
+                    <a href="/admin" class="inline-flex items-center bg-gray-600 text-white px-6 py-3 rounded-full hover:bg-gray-700 transition-colors font-medium">
+                        <i class="fas fa-cog mr-2"></i>
+                        <span x-text="currentLang === 'fr' ? 'Admin' : 'Admin'"></span>
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer class="bg-secondary-900 border-t border-secondary-800 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-secondary-400">
-                &copy; <span x-text="new Date().getFullYear()"></span> Benjamin. 
-                <span x-text="currentLang === 'fr' ? 'Tous droits réservés.' : 'All rights reserved.'"></span>
-            </p>
-        </div>
-    </footer>
+        <!-- Section 4: Contact -->
+        <section class="section gradient-primary text-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-display font-bold mb-6">
+                        <span x-text="currentLang === 'fr' ? 'Contactez-moi' : 'Contact me'"></span>
+                    </h2>
+                    <p class="text-lg opacity-90 max-w-2xl mx-auto">
+                        <span x-text="currentLang === 'fr' ? 'N&apos;hésitez pas à me contacter pour discuter de vos projets ou collaborations' : 'Feel free to contact me to discuss your projects or collaborations'"></span>
+                    </p>
+                </div>
 
-    <script src="js/main.js"></script>
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Contact Info -->
+                    <div class="space-y-8">
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                                <i class="fas fa-envelope text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Email</h3>
+                                <p class="opacity-90">benjamin@portfolio.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl hover:bg-white/30 transition-colors cursor-pointer">
+                                <i class="fab fa-linkedin text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">LinkedIn</h3>
+                                <p class="opacity-90">/in/benjamin-portfolio</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl hover:bg-white/30 transition-colors cursor-pointer">
+                                <i class="fab fa-github text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">GitHub</h3>
+                                <p class="opacity-90">github.com/benjamin</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <form class="space-y-6" @submit.prevent="submitContact()">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90" 
+                                   x-text="currentLang === 'fr' ? 'Nom' : 'Name'"></label>
+                            <input type="text" 
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                   :placeholder="currentLang === 'fr' ? 'Votre nom' : 'Your name'"
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90">Email</label>
+                            <input type="email" 
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                   :placeholder="currentLang === 'fr' ? 'votre@email.com' : 'your@email.com'"
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90" 
+                                   x-text="currentLang === 'fr' ? 'Message' : 'Message'"></label>
+                            <textarea rows="4" 
+                                      class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                      :placeholder="currentLang === 'fr' ? 'Votre message...' : 'Your message...'"
+                                      required></textarea>
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-xl hover:bg-white/30 transition-all duration-300 font-medium border border-white/20">
+                            <span x-text="currentLang === 'fr' ? 'Envoyer le message' : 'Send message'"></span>
+                            <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/main-horizontal.js"></script>
 </body>
 </html>

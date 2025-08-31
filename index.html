@@ -58,8 +58,101 @@
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
         }
-        .gradient-bg {
+        
+        /* Hero Background with Parallax */
+        .hero-parallax {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-parallax::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            z-index: 1;
+        }
+        
+        .hero-parallax::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #f8fafc);
+            z-index: 2;
+            transform: skewY(-2deg);
+            transform-origin: bottom left;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 3;
+        }
+        
+        /* Parallax Scroll Effect */
+        .parallax-element {
+            transition: transform 0.1s ease-out;
+        }
+        
+        /* Section Transitions */
+        .section-transition {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-transition::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: inherit;
+            transform: skewY(2deg);
+            transform-origin: top left;
+            z-index: 1;
+        }
+        
+        /* About Section Styling */
+        .about-section {
+            background: #f8fafc;
+            position: relative;
+            z-index: 10;
+            margin-top: -50px;
+            padding-top: 100px;
+        }
+        
+        /* Smooth Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Wave Separator */
+        .wave-separator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+        }
+        
+        .wave-separator svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 60px;
+        }
+        
+        .wave-separator .shape-fill {
+            fill: #f8fafc;
         }
     </style>
 </head>
@@ -130,9 +223,9 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="accueil" class="pt-20 pb-16 gradient-bg text-white min-h-screen flex items-center">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="animate-fade-in">
+    <section id="accueil" class="pt-20 pb-16 hero-parallax text-white min-h-screen flex items-center">
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
+            <div class="animate-fade-in parallax-element" data-speed="0.5">
                 <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
                     <span x-text="currentLang === 'fr' ? 'Benjamin' : 'Benjamin'"></span>
                     <br>
@@ -152,23 +245,30 @@
             </div>
             
             <!-- Scroll indicator -->
-            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-float">
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-float parallax-element" data-speed="0.3">
                 <i class="fas fa-chevron-down text-2xl text-white opacity-70"></i>
             </div>
+        </div>
+        
+        <!-- Wave Separator -->
+        <div class="wave-separator">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="shape-fill"></path>
+            </svg>
         </div>
     </section>
 
     <!-- About Section -->
-    <section id="apropos" class="py-20 bg-secondary-50">
+    <section id="apropos" class="about-section py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-16 parallax-element" data-speed="0.8">
                 <h2 class="text-4xl font-bold text-secondary-800 mb-4" 
                     x-text="currentLang === 'fr' ? 'À propos de moi' : 'About me'"></h2>
                 <div class="w-24 h-1 bg-primary-500 mx-auto"></div>
             </div>
             
             <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6">
+                <div class="space-y-6 parallax-element" data-speed="0.9">
                     <p class="text-lg text-secondary-600 leading-relaxed"
                        x-text="currentLang === 'fr' ? 'Développeur passionné avec une expertise en technologies web modernes. Je me spécialise dans la création d\\'applications web performantes et d\\'expériences utilisateur exceptionnelles.' : 'Passionate developer with expertise in modern web technologies. I specialize in creating high-performance web applications and exceptional user experiences.'"></p>
                     <p class="text-lg text-secondary-600 leading-relaxed"
@@ -199,7 +299,7 @@
                     </div>
                 </div>
                 
-                <div class="text-center">
+                <div class="text-center parallax-element" data-speed="0.7">
                     <div class="bg-white rounded-full w-80 h-80 mx-auto shadow-xl flex items-center justify-center">
                         <i class="fas fa-user-tie text-8xl text-primary-500"></i>
                     </div>
