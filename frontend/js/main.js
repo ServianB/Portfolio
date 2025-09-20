@@ -340,15 +340,6 @@ function horizontalPortfolio() {
                 card.style.transition = 'all 0.6s ease';
                 observer.observe(card);
             });
-        },
-
-        // Soumission du formulaire de contact
-        async submitContact() {
-            // Ici vous pourriez ajouter l'envoi vers un service de mail
-            alert(this.currentLang === 'fr' ? 
-                'Message envoyé ! Je vous répondrai bientôt.' : 
-                'Message sent! I will reply to you soon.'
-            );
         }
     }
 }

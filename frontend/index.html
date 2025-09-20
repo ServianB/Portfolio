@@ -441,11 +441,9 @@
                         <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
                             <span x-text="currentLang === 'fr' ? 'À propos de moi' : 'About me'"></span>
                         </h2>
-                        <p class="text-lg text-primary-700 mb-6 leading-relaxed">
-                            <span x-text="currentLang === 'fr' ? 'Développeur passionné avec une expertise en technologies web modernes et intelligence artificielle. Je me spécialise dans la création d&apos;applications performantes et d&apos;expériences utilisateur exceptionnelles.' : 'Passionate developer with expertise in modern web technologies and artificial intelligence. I specialize in creating high-performance applications and exceptional user experiences.'"></span>
-                        </p>
-                        <p class="text-lg text-primary-700 mb-8 leading-relaxed">
-                            <span x-text="currentLang === 'fr' ? 'Mon approche combine créativité technique et rigueur professionnelle pour livrer des solutions innovantes qui répondent aux besoins réels des utilisateurs.' : 'My approach combines technical creativity and professional rigor to deliver innovative solutions that meet real user needs.'"></span>
+                        <p class="text-lg text-primary-700 mb-6 leading-relaxed text-justify">
+                            <span x-html="currentLang === 'fr' ? 'Jeune diplomé d\'une formation d\'ingénieur informatique, je me lance dans la Freelance afin de pouvoir offrir mes compétences à des projets variés.<br>En parallèle, je m\'intéresse et monte en expertises sur de nombreux domaines IT qui m\'inspirent.<br>A travers ce portfolio, je souhaite mettre en avant mes compétences et mes futures réalisations.' : 
+                                'Young graduate of a computer engineering program, I am embarking on freelancing to offer my skills to various projects.<br>At the same time, I am interested in and gaining expertise in many IT areas that inspire me.<br>Through this portfolio, I want to showcase my skills and future achievements.'"></span>
                         </p>
                         
                         <!-- Skills Grid -->
@@ -455,7 +453,7 @@
                                     <i class="fab fa-react text-2xl text-blue-500 mr-3"></i>
                                     <h3 class="font-semibold text-primary-800">Frontend</h3>
                                 </div>
-                                <p class="text-sm text-primary-600">React, Vue.js, Tailwind CSS</p>
+                                <p class="text-sm text-primary-600">React, Tailwind CSS</p>
                             </div>
                             <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                                 <div class="flex items-center mb-3">
@@ -469,7 +467,7 @@
                                     <i class="fas fa-database text-2xl text-purple-500 mr-3"></i>
                                     <h3 class="font-semibold text-primary-800">Database</h3>
                                 </div>
-                                <p class="text-sm text-primary-600">MongoDB, PostgreSQL, SQLite</p>
+                                <p class="text-sm text-primary-600">PostgreSQL, MongoDB, SQLite</p>
                             </div>
                             <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                                 <div class="flex items-center mb-3">
@@ -481,15 +479,22 @@
                         </div>
                     </div>
                     
+                    <!-- Picture -->
                     <div class="animate-slide-in-right text-center lg:text-right">
                         <div class="relative inline-block">
-                            <div class="w-80 h-80 bg-gradient-accent rounded-full flex items-center justify-center shadow-2xl">
-                                <i class="fas fa-user-tie text-8xl text-white"></i>
+                            <div class="w-96 h-96 bg-gradient-accent rounded-full flex items-center justify-center shadow-2xl overflow-hidden">
+                                <!-- Photo de profil - remplacez le src par votre photo -->
+                                <img src="images/profile.jpg" 
+                                     alt="Benjamin Servian" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <!-- Fallback icon si l'image ne charge pas -->
+                                <i class="fas fa-user-tie text-8xl text-white" style="display: none;"></i>
                             </div>
                             <div class="absolute -top-4 -right-4 w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center">
                                 <i class="fas fa-code text-2xl text-accent-500"></i>
                             </div>
-                            <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center">
+                            <div class="absolute -bottom-2 -left-2 w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center">
                                 <i class="fas fa-lightbulb text-xl text-yellow-500"></i>
                             </div>
                         </div>
@@ -580,7 +585,41 @@
                     </div>
 
                     <!-- Contact Form -->
-                    <form class="space-y-6" @submit.prevent="submitContact()">
+                    <form action="https://formspree.io/f/mdklqprg" method="POST" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90" 
+                                   x-text="currentLang === 'fr' ? 'Nom' : 'Name'"></label>
+                            <input type="text" 
+                                   name="name"
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                   :placeholder="currentLang === 'fr' ? 'Votre nom' : 'Your name'"
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90">Email</label>
+                            <input type="email" 
+                                   name="email"
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                   :placeholder="currentLang === 'fr' ? 'votre@email.com' : 'your@email.com'"
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 opacity-90" 
+                                   x-text="currentLang === 'fr' ? 'Message' : 'Message'"></label>
+                            <textarea rows="4" 
+                                      name="message"
+                                      class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
+                                      :placeholder="currentLang === 'fr' ? 'Votre message...' : 'Your message...'"
+                                      required></textarea>
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-xl hover:bg-white/30 transition-all duration-300 font-medium border border-white/20">
+                            <span x-text="currentLang === 'fr' ? 'Envoyer le message' : 'Send message'"></span>
+                            <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                    
+                    <!-- <form class="space-y-6" @submit.prevent="submitContact()">
                         <div>
                             <label class="block text-sm font-medium mb-2 opacity-90" 
                                    x-text="currentLang === 'fr' ? 'Nom' : 'Name'"></label>
@@ -609,7 +648,7 @@
                             <span x-text="currentLang === 'fr' ? 'Envoyer le message' : 'Send message'"></span>
                             <i class="fas fa-paper-plane ml-2"></i>
                         </button>
-                    </form>
+                    </form> -->
                 </div>
             </div>
         </section>
@@ -622,7 +661,7 @@
             return {
                 currentLang: localStorage.getItem('preferred-language') || 'fr',
                 mobileMenuOpen: false,
-                projects: [],
+                projects: [], 
                 currentSection: 0,
                 totalSections: 5,
                 isScrolling: false,
