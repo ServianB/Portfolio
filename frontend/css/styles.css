@@ -1,0 +1,136 @@
+/* 
+ * Styles optimisés consolidés
+ * Tous les styles communs pour éliminer les redondances
+ */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Base styles */
+body {
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* Animations réutilisables */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Gradients harmonisés */
+.gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-secondary {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 100%);
+}
+
+.gradient-accent {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient-soft {
+    background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #f8fafc 100%);
+}
+
+.gradient-warm {
+    background: linear-gradient(135deg, #fef7ff 0%, #fceeff 50%, #f5d9ff 100%);
+}
+
+.gradient-contact {
+    background: linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%);
+}
+
+.gradient-icon-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-icon-2 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient-icon-3 {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+/* Progress bar */
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    z-index: 9999;
+    transition: width 0.1s ease;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+}
+
+.scroll-indicator i {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Scroll smooth enhanced */
+.scroll-smooth-enhanced {
+    scroll-behavior: smooth;
+}
+
+/* Language toggle button */
+.language-toggle {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 1000;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.language-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .scroll-indicator {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .language-toggle {
+        bottom: 1rem;
+        left: 1rem;
+    }
+}
