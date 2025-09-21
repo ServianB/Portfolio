@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" class="overflow-hidden">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,6 @@
     <meta name="description" content="Portfolio de Benjamin - Développeur Full Stack, spécialisé en technologies modernes">
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -61,23 +58,12 @@
         /* Custom styles for horizontal scrolling */
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            scroll-behavior: smooth;
         }
         
-        .horizontal-container {
-            display: flex;
-            width: 500vw; /* 5 sections × 100vw */
-            height: 100vh;
-            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        
-        .section {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+        section {
+            width: 100%;
+            padding: 2rem 0;
         }
         
         /* Custom animations */
@@ -116,32 +102,6 @@
         .scroll-indicator i {
             display: block;
             margin: 0 auto 0.5rem auto;
-        }
-        
-        /* Navigation dots */
-        .nav-dots {
-            position: fixed;
-            top: 50%;
-            right: 2rem;
-            transform: translateY(-50%);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .nav-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-dot.active {
-            background: #d055ff;
-            transform: scale(1.2);
         }
         
         /* Project cards hover effects */
@@ -226,7 +186,7 @@
         }
     </style>
 </head>
-<<body class="font-inter bg-white text-primary-800" x-data="horizontalPortfolio()">
+<<body class="font-inter bg-white text-primary-800">
     <!-- Fixed Navigation Bar -->
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-primary-200 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
@@ -238,85 +198,57 @@
                 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-12">
-                    <button @click="goToSection(0)" :class="currentSection === 0 ? 'text-accent-500' : 'text-primary-600'"
-                            class="hover:text-accent-500 transition-colors font-medium">
-                        <span x-text="currentLang === 'fr' ? 'Intro' : 'Intro'"></span>
-                    </button>
-                    <button @click="goToSection(1)" :class="currentSection === 1 ? 'text-accent-500' : 'text-primary-600'"
-                            class="hover:text-accent-500 transition-colors font-medium">
-                        <span x-text="currentLang === 'fr' ? 'Accueil' : 'Home'"></span>
-                    </button>
-                    <button @click="goToSection(2)" :class="currentSection === 2 ? 'text-accent-500' : 'text-primary-600'"
-                            class="hover:text-accent-500 transition-colors font-medium">
-                        <span x-text="currentLang === 'fr' ? 'À propos' : 'About'"></span>
-                    </button>
-                    <button @click="goToSection(3)" :class="currentSection === 3 ? 'text-accent-500' : 'text-primary-600'"
-                            class="hover:text-accent-500 transition-colors font-medium">
-                        <span x-text="currentLang === 'fr' ? 'Projets' : 'Projects'"></span>
-                    </button>
-                    <button @click="goToSection(4)" :class="currentSection === 4 ? 'text-accent-500' : 'text-primary-600'"
-                            class="hover:text-accent-500 transition-colors font-medium">
-                        <span x-text="currentLang === 'fr' ? 'Contact' : 'Contact'"></span>
-                    </button>
+                    <a href="#intro" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
+                        <span>Intro</span>
+                    </a>
+                    <a href="#home" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
+                        <span>Accueil</span>
+                    </a>
+                    <a href="#about" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
+                        <span>À propos</span>
+                    </a>
+                    <a href="#projects" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
+                        <span>Projets</span>
+                    </a>
+                    <a href="#contact" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
+                        <span>Contact</span>
+                    </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2">
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2">
                     <i class="fas fa-bars text-primary-600 text-xl"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div x-show="mobileMenuOpen" 
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             x-transition:leave="transition ease-in duration-75"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-95"
-             class="md:hidden bg-white border-t border-primary-200 shadow-lg">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-primary-200 shadow-lg">
             <div class="px-6 py-4 space-y-3">
-                <button @click="goToSection(0); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span x-text="currentLang === 'fr' ? 'Intro' : 'Intro'"></span>
-                </button>
-                <button @click="goToSection(1); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span x-text="currentLang === 'fr' ? 'Accueil' : 'Home'"></span>
-                </button>
-                <button @click="goToSection(2); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span x-text="currentLang === 'fr' ? 'À propos' : 'About'"></span>
-                </button>
-                <button @click="goToSection(3); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span x-text="currentLang === 'fr' ? 'Projets' : 'Projects'"></span>
-                </button>
-                <button @click="goToSection(4); mobileMenuOpen = false" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span x-text="currentLang === 'fr' ? 'Contact' : 'Contact'"></span>
-                </button>
+                <a href="#intro" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span>Intro</span>
+                </a>
+                <a href="#home" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span>Accueil</span>
+                </a>
+                <a href="#about" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span>À propos</span>
+                </a>
+                <a href="#projects" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span>Projets</span>
+                </a>
+                <a href="#contact" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
+                    <span>Contact</span>
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Language Toggle Button (Fixed Bottom Left) -->
-    <button @click="toggleLanguage()" 
-            class="fixed bottom-6 left-6 z-50 bg-white/90 backdrop-blur-md border border-primary-200 px-4 py-2 rounded-full hover:bg-accent-50 hover:border-accent-300 transition-all duration-300 shadow-lg font-medium">
-        <span x-text="currentLang.toUpperCase()"></span>
-        <i class="fas fa-globe ml-2 text-accent-500"></i>
-    </button>
-
-    <!-- Navigation Dots (Fixed Right) -->
-    <div class="nav-dots">
-        <div @click="goToSection(0)" :class="currentSection === 0 ? 'active' : ''" class="nav-dot"></div>
-        <div @click="goToSection(1)" :class="currentSection === 1 ? 'active' : ''" class="nav-dot"></div>
-        <div @click="goToSection(2)" :class="currentSection === 2 ? 'active' : ''" class="nav-dot"></div>
-        <div @click="goToSection(3)" :class="currentSection === 3 ? 'active' : ''" class="nav-dot"></div>
-        <div @click="goToSection(4)" :class="currentSection === 4 ? 'active' : ''" class="nav-dot"></div>
-    </div>
-
-    <!-- Main Horizontal Container -->
-    <div class="horizontal-container" :style="`transform: translateX(-${currentSection * 100}vw)`">
+    <!-- Main Content -->
+    <main>
         
         <!-- Section 0: Landing Intro -->
-        <section class="section gradient-primary text-white relative">
+        <section id="intro" class="min-h-screen gradient-primary text-white relative flex items-center justify-center">
             <!-- Réseaux sociaux - Positionnés à gauche verticalement -->
             <div class="fixed left-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
                 <div class="flex flex-col items-center space-y-8">
@@ -346,13 +278,13 @@
                         Benjamin Servian
                     </h1>
                     <p class="text-xl md:text-2xl font-light mb-12 opacity-90">
-                        <span x-text="currentLang === 'fr' ? 'Développeur Fullstack' : 'Fullstack Developer'"></span>
+                        <span>Développeur Fullstack</span>
                     </p>
-                    <button @click="goToSection(1)" 
+                    <a href="#home" 
                             class="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium">
-                        <span x-text="currentLang === 'fr' ? 'Commencer l\'exploration' : 'Start exploring'"></span>
+                        <span>Commencer l'exploration</span>
                         <i class="fas fa-arrow-right ml-3"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
             
@@ -380,19 +312,19 @@
             <!-- Scroll indicator - repositionné -->
             <div class="scroll-indicator">
                 <i class="fas fa-mouse text-2xl mb-2"></i>
-                <p class="text-sm" x-text="currentLang === 'fr' ? 'Scroll pour naviguer' : 'Scroll to navigate'"></p>
+                <p class="text-sm">Scroll pour naviguer</p>
             </div>
         </section>
 
         <!-- Section 1: Home/Welcome -->
-        <section class="section bg-white">
+        <section id="home" class="min-h-screen bg-white flex items-center justify-center">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="animate-slide-in-left">
                     <h2 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-6">
-                        <span x-text="currentLang === 'fr' ? 'Créateur d\'expériences' : 'Experience Creator'"></span>
+                        <span>Créateur d'expériences</span>
                     </h2>
                     <p class="text-xl md:text-2xl text-primary-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                        <span x-text="currentLang === 'fr' ? 'Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.' : 'I transform ideas into innovative digital solutions, combining technical creativity and professional excellence.'"></span>
+                        <span>Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.</span>
                     </p>
                     <div class="grid md:grid-cols-3 gap-8 mt-12">
                         <div class="text-center p-6">
@@ -400,10 +332,10 @@
                                 <i class="fas fa-brain text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span x-text="currentLang === 'fr' ? 'Développement Web' : 'Web Development'"></span>
+                                <span>Développement Web</span>
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span x-text="currentLang === 'fr' ? 'Des sites pensés pour les clients' : 'Websites designed for clients'"></span>
+                                <span>Des sites pensés pour les clients</span>
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -411,10 +343,10 @@
                                 <i class="fas fa-code text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span x-text="currentLang === 'fr' ? 'Développement mobile' : 'Mobile Development'"></span>
+                                <span>Développement mobile</span>
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span x-text="currentLang === 'fr' ? 'Solutions Android & IOS' : 'Android & IOS Solutions'"></span>
+                                <span>Solutions Android & IOS</span>
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -422,10 +354,10 @@
                                 <i class="fas fa-rocket text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span x-text="currentLang === 'fr' ? 'Innovation' : 'Innovation'"></span>
+                                <span>Innovation</span>
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span x-text="currentLang === 'fr' ? 'Technologies de pointe' : 'Cutting-edge Tech'"></span>
+                                <span>Technologies de pointe</span>
                             </p>
                         </div>
                     </div>
@@ -434,16 +366,15 @@
         </section>
 
         <!-- Section 2: About -->
-        <section class="section bg-primary-50">
+        <section id="about" class="min-h-screen bg-primary-50 flex items-center justify-center">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="animate-slide-in-left">
                         <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
-                            <span x-text="currentLang === 'fr' ? 'À propos de moi' : 'About me'"></span>
+                            <span>À propos de moi</span>
                         </h2>
                         <p class="text-lg text-primary-700 mb-6 leading-relaxed text-justify">
-                            <span x-html="currentLang === 'fr' ? 'Jeune diplomé d\'une formation d\'ingénieur informatique, je me lance dans la Freelance afin de pouvoir offrir mes compétences à des projets variés.<br>En parallèle, je m\'intéresse et monte en expertises sur de nombreux domaines IT qui m\'inspirent.<br>A travers ce portfolio, je souhaite mettre en avant mes compétences et mes futures réalisations.' : 
-                                'Young graduate of a computer engineering program, I am embarking on freelancing to offer my skills to various projects.<br>At the same time, I am interested in and gaining expertise in many IT areas that inspire me.<br>Through this portfolio, I want to showcase my skills and future achievements.'"></span>
+                            <span>Jeune diplomé d'une formation d'ingénieur informatique, je me lance dans la Freelance afin de pouvoir offrir mes compétences à des projets variés.<br>En parallèle, je m'intéresse et monte en expertises sur de nombreux domaines IT qui m'inspirent.<br>A travers ce portfolio, je souhaite mettre en avant mes compétences et mes futures réalisations.</span>
                         </p>
                         
                         <!-- Skills Grid -->
@@ -504,14 +435,14 @@
         </section>
 
         <!-- Section 3: Projects -->
-        <section class="section bg-white">
+        <section id="projects" class="min-h-screen bg-white flex items-center justify-center">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
-                        <span x-text="currentLang === 'fr' ? 'Projets Mis en Avant' : 'Featured Projects'"></span>
+                        <span>Projets Mis en Avant</span>
                     </h2>
                     <p class="text-lg text-primary-600 max-w-2xl mx-auto">
-                        <span x-text="currentLang === 'fr' ? 'Découvrez une sélection de mes meilleurs projets professionnels et universitaires' : 'Discover a selection of my best professional and academic projects'"></span>
+                        <span>Découvrez une sélection de mes meilleurs projets professionnels et universitaires</span>
                     </p>
                 </div>
 
@@ -524,29 +455,29 @@
                 <div class="text-center mt-12 space-x-4 flex flex-wrap justify-center gap-4">
                     <a href="/projects" class="inline-flex items-center bg-accent-500 text-white px-6 py-3 rounded-full hover:bg-accent-600 transition-colors font-medium">
                         <i class="fas fa-folder-open mr-2"></i>
-                        <span x-text="currentLang === 'fr' ? 'Tous les projets' : 'All projects'"></span>
+                        <span>Tous les projets</span>
                     </a>
-                    <button @click="loadProjects()" class="inline-flex items-center bg-primary-600 text-white px-6 py-3 rounded-full hover:bg-primary-700 transition-colors font-medium">
+                    <button onclick="loadProjects()" class="inline-flex items-center bg-primary-600 text-white px-6 py-3 rounded-full hover:bg-primary-700 transition-colors font-medium">
                         <i class="fas fa-refresh mr-2"></i>
-                        <span x-text="currentLang === 'fr' ? 'Actualiser' : 'Refresh'"></span>
+                        <span>Actualiser</span>
                     </button>
                     <a href="/admin" class="inline-flex items-center bg-gray-600 text-white px-6 py-3 rounded-full hover:bg-gray-700 transition-colors font-medium">
                         <i class="fas fa-cog mr-2"></i>
-                        <span x-text="currentLang === 'fr' ? 'Admin' : 'Admin'"></span>
+                        <span>Admin</span>
                     </a>
                 </div>
             </div>
         </section>
 
         <!-- Section 4: Contact -->
-        <section class="section gradient-primary text-white">
+        <section id="contact" class="min-h-screen gradient-primary text-white flex items-center justify-center">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-display font-bold mb-6">
-                        <span x-text="currentLang === 'fr' ? 'Contactez-moi' : 'Contact me'"></span>
+                        <span>Contactez-moi</span>
                     </h2>
                     <p class="text-lg opacity-90 max-w-2xl mx-auto">
-                        <span x-text="currentLang === 'fr' ? 'N&apos;hésitez pas à me contacter pour discuter de vos projets ou collaborations' : 'Feel free to contact me to discuss your projects or collaborations'"></span>
+                        <span>N'hésitez pas à me contacter pour discuter de vos projets ou collaborations</span>
                     </p>
                 </div>
 
@@ -591,12 +522,11 @@
                     <!-- Contact Form -->
                     <form action="https://formspree.io/f/mdklqprg" method="POST" class="space-y-6">
                         <div>
-                            <label class="block text-sm font-medium mb-2 opacity-90" 
-                                   x-text="currentLang === 'fr' ? 'Nom' : 'Name'"></label>
+                            <label class="block text-sm font-medium mb-2 opacity-90">Nom</label>
                             <input type="text" 
                                    name="name"
                                    class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
-                                   :placeholder="currentLang === 'fr' ? 'Votre nom' : 'Your name'"
+                                   placeholder="Votre nom"
                                    required>
                         </div>
                         <div>
@@ -604,120 +534,28 @@
                             <input type="email" 
                                    name="email"
                                    class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
-                                   :placeholder="currentLang === 'fr' ? 'votre@email.com' : 'your@email.com'"
+                                   placeholder="votre@email.com"
                                    required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2 opacity-90" 
-                                   x-text="currentLang === 'fr' ? 'Message' : 'Message'"></label>
+                            <label class="block text-sm font-medium mb-2 opacity-90">Message</label>
                             <textarea rows="4" 
                                       name="message"
                                       class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60" 
-                                      :placeholder="currentLang === 'fr' ? 'Votre message...' : 'Your message...'"
+                                      placeholder="Votre message..."
                                       required></textarea>
                         </div>
                         <button type="submit" 
                                 class="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-xl hover:bg-white/30 transition-all duration-300 font-medium border border-white/20">
-                            <span x-text="currentLang === 'fr' ? 'Envoyer le message' : 'Send message'"></span>
+                            <span>Envoyer le message</span>
                             <i class="fas fa-paper-plane ml-2"></i>
                         </button>
                     </form>
                 </div>
             </div>
         </section>
-    </div>
+    </main>
 
-    <!-- Script de débogage Alpine.js -->
-    <script>
-        // Portfolio JavaScript intégré pour éviter les problèmes de chargement
-        function horizontalPortfolio() {
-            return {
-                currentLang: localStorage.getItem('preferred-language') || 'fr',
-                mobileMenuOpen: false,
-                projects: [], 
-                currentSection: 0,
-                totalSections: 5,
-                isScrolling: false,
-
-                // Initialisation
-                init() {
-                    console.log('Portfolio initialisé');
-                    this.setupHorizontalScroll();
-                    this.loadProjects();
-                },
-
-                // Navigation entre sections
-                goToSection(sectionIndex) {
-                    if (sectionIndex >= 0 && sectionIndex < this.totalSections) {
-                        this.currentSection = sectionIndex;
-                        console.log('Navigation vers section:', sectionIndex);
-                    }
-                },
-
-                // Basculer la langue
-                toggleLanguage() {
-                    this.currentLang = this.currentLang === 'fr' ? 'en' : 'fr';
-                    localStorage.setItem('preferred-language', this.currentLang);
-                    console.log('Langue changée vers:', this.currentLang);
-                },
-
-                // Configuration du scroll horizontal
-                setupHorizontalScroll() {
-                    let isScrolling = false;
-                    
-                    window.addEventListener('wheel', (e) => {
-                        if (isScrolling) return;
-                        e.preventDefault();
-                        
-                        const delta = e.deltaY || e.deltaX;
-                        
-                        if (delta > 0 && this.currentSection < this.totalSections - 1) {
-                            this.goToSection(this.currentSection + 1);
-                        } else if (delta < 0 && this.currentSection > 0) {
-                            this.goToSection(this.currentSection - 1);
-                        }
-                        
-                        isScrolling = true;
-                        setTimeout(() => { isScrolling = false; }, 800);
-                    }, { passive: false });
-                },
-
-                // Charger les projets
-                async loadProjects() {
-                    try {
-                        const response = await fetch('/api/projects?featured=true');
-                        if (response.ok) {
-                            const data = await response.json();
-                            this.projects = data.projects || [];
-                            console.log('Projets chargés:', this.projects.length);
-                        }
-                    } catch (error) {
-                        console.error('Erreur chargement projets:', error);
-                        this.projects = [];
-                    }
-                },
-
-                // Soumettre le formulaire de contact
-                submitContact() {
-                    alert('Message envoyé !');
-                }
-            }
-        }
-
-        // Vérifier le chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded');
-            
-            setTimeout(() => {
-                if (window.Alpine) {
-                    console.log('Alpine.js chargé avec succès');
-                } else {
-                    console.error('Alpine.js non chargé');
-                }
-            }, 1000);
-        });
-    </script>
-
-    <script src="js/main-horizontal.js"></script>
+    <script src="js/main-vertical.js"></script>
 </body>
 </html>
