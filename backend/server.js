@@ -8,6 +8,10 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuration pour Vercel
+const isDev = process.env.NODE_ENV !== 'production';
+const isVercel = process.env.VERCEL === '1';
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -18,7 +22,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Configuration multer pour upload d'images
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'uploads'))
+    const uploadPath = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname)
@@ -28,7 +33,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Initialisation de la base de données
-const db = new sqlite3.Database('./portfolio.db');
+const dbPath = isVercel ? '/tmp/portfolio.db' : './portfolio.db';
+const db = new sqlite3.Database(dbPath);
 
 // Création des tables
 db.serialize(() => {
@@ -203,10 +209,12 @@ app.get('/project/:id', (req, res) => {
 });
 
 // Démarrage du serveur
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Frontend: http://localhost:${PORT}`);
-  console.log(`Admin: http://localhost:${PORT}/admin`);
-});
+if (isDev && !isVercel) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Frontend: http://localhost:${PORT}`);
+    console.log(`Admin: http://localhost:${PORT}/admin`);
+  });
+}
 
 module.exports = app;
