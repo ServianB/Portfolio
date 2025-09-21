@@ -1,28 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr" class="scroll-smooth scroll-smooth-enhanced">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tous les projets - Benjamin Portfolio</title>
+    <meta name="description" content="Découvrez tous les projets de Benjamin - Développeur Full Stack">
+    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         'inter': ['Inter', 'sans-serif'],
+                        'display': ['Playfair Display', 'serif'],
                     },
                     colors: {
                         'primary': {
-                            50: '#f0f9ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        },
-                        'secondary': {
                             50: '#f8fafc',
                             100: '#f1f5f9',
                             200: '#e2e8f0',
@@ -33,26 +29,151 @@
                             700: '#334155',
                             800: '#1e293b',
                             900: '#0f172a',
+                        },
+                        'accent': {
+                            50: '#fef7ff',
+                            100: '#fceeff',
+                            200: '#f5d9ff',
+                            300: '#ecb8ff',
+                            400: '#de87ff',
+                            500: '#d055ff',
+                            600: '#c233f7',
+                            700: '#a71de3',
+                            800: '#8a19bb',
+                            900: '#741b98',
                         }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out',
+                        'slide-in-left': 'slideInLeft 0.8s ease-out',
+                        'slide-in-right': 'slideInRight 0.8s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Custom styles harmonisés avec index.html */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Custom gradient backgrounds harmonisés */
+        .gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 100%);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .gradient-soft {
+            background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #f8fafc 100%);
+        }
+        
+        .gradient-warm {
+            background: linear-gradient(135deg, #fef7ff 0%, #fceeff 50%, #f5d9ff 100%);
+        }
+        
+        .gradient-contact {
+            background: linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%);
+        }
+        
+        /* Gradients harmonieux pour les icônes */
+        .gradient-icon-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-icon-2 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .gradient-icon-3 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        /* Barre de progression harmonieuse */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #4facfe 100%);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+        
+        /* Project cards hover effects */
+        .project-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Amélioration de l'harmonie visuelle */
+        .scroll-smooth-enhanced {
+            scroll-behavior: smooth;
+            scroll-padding-top: 2rem;
+        }
+    </style>
 </head>
-<body class="font-inter bg-white text-secondary-800" x-data="allProjectsPage()">
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-secondary-200 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<body class="font-inter bg-white text-primary-800">
+    <!-- Barre de progression -->
+    <div class="progress-bar" id="progress-bar"></div>
+    
+    <!-- Navigation harmonisée -->
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-primary-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="text-2xl font-bold text-primary-600">
-                    <a href="/">Benjamin<span class="text-secondary-400">.</span></a>
+                <!-- Logo -->
+                <div class="text-2xl font-display font-bold text-primary-900">
+                    <a href="index.html" class="hover:text-primary-600 transition-colors">
+                        Benjamin<span class="text-accent-500">.</span>
+                    </a>
+
+
+
                 </div>
                 
+                <!-- Navigation principale -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html#home" class="text-primary-600 hover:text-primary-700 transition-colors font-medium">Accueil</a>
+                    <a href="index.html#about" class="text-primary-600 hover:text-primary-700 transition-colors font-medium">À propos</a>
+                    <a href="projects.html" class="text-primary-800 font-semibold">Projets</a>
+                    <a href="index.html#contact" class="text-primary-600 hover:text-primary-700 transition-colors font-medium">Contact</a>
+                </div>
+                
+                <!-- Boutons d'action -->
                 <div class="flex items-center space-x-4">
                     <!-- Filter Dropdown -->
-                    <select x-model="selectedCategory" @change="filterProjects()" 
-                            class="px-3 py-1 text-sm border border-secondary-300 rounded-md focus:ring-2 focus:ring-primary-500">
+                    <select id="categoryFilter" onchange="filterProjects()" 
+                            class="px-3 py-2 text-sm border border-primary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                         <option value="">Toutes les catégories</option>
                         <option value="Web">Web</option>
                         <option value="Mobile">Mobile</option>
@@ -62,212 +183,394 @@
                         <option value="E-commerce">E-commerce</option>
                     </select>
                     
-                    <button @click="toggleLanguage()" 
-                            class="px-3 py-1 text-sm border border-secondary-300 rounded-md hover:bg-secondary-50 transition-colors">
-                        <span x-text="currentLang.toUpperCase()"></span>
-                    </button>
-                    <a href="/" class="text-secondary-600 hover:text-primary-600 transition-colors">
+                    <a href="index.html" class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
                         <i class="fas fa-arrow-left mr-2"></i>
-                        <span x-text="currentLang === 'fr' ? 'Retour' : 'Back'"></span>
+                        Retour
                     </a>
+                </div>
+                
+                <!-- Menu mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-primary-600 hover:text-primary-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu mobile -->
+            <div id="mobile-menu" class="hidden md:hidden border-t border-primary-200 py-4">
+                <div class="flex flex-col space-y-2">
+                    <a href="index.html#home" class="px-3 py-2 text-primary-600 hover:text-primary-700 transition-colors">Accueil</a>
+                    <a href="index.html#about" class="px-3 py-2 text-primary-600 hover:text-primary-700 transition-colors">À propos</a>
+                    <a href="projects.html" class="px-3 py-2 text-primary-800 font-semibold">Projets</a>
+                    <a href="index.html#contact" class="px-3 py-2 text-primary-600 hover:text-primary-700 transition-colors">Contact</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Projects Header -->
-    <section class="pt-24 pb-12 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4" 
-                x-text="currentLang === 'fr' ? 'Tous mes projets' : 'All my projects'"></h1>
-            <p class="text-xl text-primary-100" 
-               x-text="currentLang === 'fr' ? 'Découvrez l\\'ensemble de mes réalisations professionnelles et académiques' : 'Discover all my professional and academic achievements'"></p>
+    <!-- Projects Header harmonisé -->
+    <section class="pt-32 pb-16 gradient-primary text-white relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <div class="animate-fade-in">
+                <h1 class="text-5xl md:text-7xl font-display font-bold mb-6">
+                    Tous mes projets
+                </h1>
+                <p class="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto leading-relaxed">
+                    Découvrez l'ensemble de mes réalisations professionnelles et académiques
+                </p>
+            </div>
         </div>
+        
+        <!-- Scroll indicator -->
+        <!-- <div class="scroll-indicator">
+            <span class="text-sm">Explorez</span>
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div> -->
     </section>
 
-    <!-- Projects Grid -->
-    <section class="py-16 bg-secondary-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-primary-600" x-text="projects.length"></div>
-                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets au total' : 'Total projects'"></div>
+    <!-- Projects Grid harmonisé -->
+    <section class="py-20 gradient-soft">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <!-- Stats harmonisées -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 gradient-icon-1 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-code text-white text-2xl"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-primary-800 mb-2" id="total-projects">15</div>
+                    <div class="text-primary-600 font-medium">Projets au total</div>
                 </div>
-                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-green-600" x-text="featuredCount"></div>
-                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets mis en avant' : 'Featured projects'"></div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 gradient-icon-2 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-star text-white text-2xl"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-primary-800 mb-2" id="featured-projects">6</div>
+                    <div class="text-primary-600 font-medium">Projets mis en avant</div>
                 </div>
-                <div class="bg-white rounded-lg p-6 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-purple-600" x-text="filteredProjects.length"></div>
-                    <div class="text-secondary-600" x-text="currentLang === 'fr' ? 'Projets affichés' : 'Displayed projects'"></div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 gradient-icon-3 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-eye text-white text-2xl"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-primary-800 mb-2" id="displayed-projects">15</div>
+                    <div class="text-primary-600 font-medium">Projets affichés</div>
                 </div>
             </div>
 
-            <!-- Search and Filter -->
-            <div class="mb-8 flex flex-col md:flex-row gap-4">
+            <!-- Search and Filter harmonisés -->
+            <div class="mb-12 flex flex-col md:flex-row gap-6 bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <div class="flex-1">
-                    <input type="text" x-model="searchTerm" @input="filterProjects()"
-                           :placeholder="currentLang === 'fr' ? 'Rechercher un projet...' : 'Search a project...'"
-                           class="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-400"></i>
+                        <input type="text" id="searchInput" oninput="filterProjects()"
+                               placeholder="Rechercher un projet..."
+                               class="w-full pl-12 pr-4 py-3 border border-primary-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white/80 backdrop-blur-sm">
+                    </div>
                 </div>
-                <button @click="loadProjects()" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <button onclick="loadProjects()" 
+                        class="px-8 py-3 gradient-primary text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium">
                     <i class="fas fa-refresh mr-2"></i>
-                    <span x-text="currentLang === 'fr' ? 'Actualiser' : 'Refresh'"></span>
+                    Actualiser
                 </button>
             </div>
 
-            <!-- Projects Grid -->
+            <!-- Projects Grid harmonisé -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="all-projects-container">
-                <template x-for="project in filteredProjects" :key="project.id">
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                        <div class="relative">
-                            <template x-if="project.image_url">
-                                <img :src="project.image_url" :alt="currentLang === 'fr' ? project.title_fr : project.title_en" 
-                                     class="w-full h-48 object-cover">
-                            </template>
-                            <template x-if="!project.image_url">
-                                <div class="w-full h-48 bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                                    <i class="fas fa-code text-4xl text-white"></i>
-                                </div>
-                            </template>
-                            <div class="absolute top-4 right-4 space-x-2">
-                                <span class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium"
-                                      x-text="project.category || 'Web'"></span>
-                                <template x-if="project.featured">
-                                    <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                        <i class="fas fa-star"></i>
-                                    </span>
-                                </template>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-secondary-800 mb-3" 
-                                x-text="currentLang === 'fr' ? project.title_fr : project.title_en"></h3>
-                            <p class="text-secondary-600 mb-4 line-clamp-3" 
-                               x-text="currentLang === 'fr' ? project.description_fr : project.description_en"></p>
-                            
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <template x-for="tech in (project.technologies || '').split(',').slice(0, 3)" :key="tech">
-                                    <span class="bg-secondary-100 text-secondary-700 px-2 py-1 rounded-md text-sm" 
-                                          x-text="tech.trim()"></span>
-                                </template>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <a :href="'/project/' + project.id" 
-                                   class="text-primary-600 hover:text-primary-700 font-medium">
-                                    <span x-text="currentLang === 'fr' ? 'Voir le projet' : 'View project'"></span> →
-                                </a>
-                                <div class="space-x-2">
-                                    <template x-if="project.github_url">
-                                        <a :href="project.github_url" target="_blank" 
-                                           class="text-secondary-400 hover:text-secondary-600">
-                                            <i class="fab fa-github text-lg"></i>
-                                        </a>
-                                    </template>
-                                    <template x-if="project.live_url">
-                                        <a :href="project.live_url" target="_blank" 
-                                           class="text-secondary-400 hover:text-secondary-600">
-                                            <i class="fas fa-external-link-alt text-lg"></i>
-                                        </a>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
+                <!-- Les projets seront chargés dynamiquement ici -->
             </div>
-
+        </div>
+    </section>                    
             <!-- No projects message -->
-            <div x-show="filteredProjects.length === 0" class="text-center py-12">
-                <i class="fas fa-search text-6xl text-secondary-300 mb-4"></i>
-                <h3 class="text-2xl font-semibold text-secondary-600 mb-2" 
-                    x-text="currentLang === 'fr' ? 'Aucun projet trouvé' : 'No projects found'"></h3>
-                <p class="text-secondary-500" 
-                   x-text="currentLang === 'fr' ? 'Essayez avec d\\'autres mots-clés ou filtres' : 'Try with other keywords or filters'"></p>
+            <div id="no-projects-message" class="hidden text-center py-16">
+                <i class="fas fa-search text-6xl text-primary-300 mb-6"></i>
+                <h3 class="text-3xl font-semibold text-primary-600 mb-4">Aucun projet trouvé</h3>
+                <p class="text-primary-500 text-lg">Essayez avec d'autres mots-clés ou filtres</p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-secondary-900 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-secondary-400">
-                &copy; <span x-text="new Date().getFullYear()"></span> Benjamin. 
-                <span x-text="currentLang === 'fr' ? 'Tous droits réservés.' : 'All rights reserved.'"></span>
-            </p>
+    <!-- Footer harmonisé -->
+    <footer class="gradient-contact text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <div class="animate-fade-in">
+                <p class="text-white/80 text-lg">
+                    &copy; <span id="current-year"></span> Benjamin. Tous droits réservés.
+                </p>
+                <div class="mt-4 flex justify-center space-x-6">
+                    <a href="https://github.com/ServianB" target="_blank" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/benjamin-servian" target="_blank" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="https://instagram.com/benjasrv" target="_blank" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- JavaScript harmonisé -->
+    <script src="js/main-vertical.js"></script>
     <script>
-        function allProjectsPage() {
-            return {
-                currentLang: localStorage.getItem('preferred-language') || 'fr',
-                projects: [],
-                filteredProjects: [],
-                searchTerm: '',
-                selectedCategory: '',
-                featuredCount: 0,
+        // Variables globales
+        let allProjects = [];
+        let filteredProjects = [];
+        
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
 
-                init() {
-                    this.loadProjects();
-                },
-
-                async loadProjects() {
-                    try {
-                        const response = await fetch('/api/projects');
-                        const data = await response.json();
-                        this.projects = data.projects || [];
-                        this.featuredCount = this.projects.filter(p => p.featured).length;
-                        this.filterProjects();
-                    } catch (error) {
-                        console.error('Erreur lors du chargement des projets:', error);
-                    }
-                },
-
-                filterProjects() {
-                    let filtered = this.projects;
-
-                    // Filter by category
-                    if (this.selectedCategory) {
-                        filtered = filtered.filter(project => project.category === this.selectedCategory);
-                    }
-
-                    // Filter by search term
-                    if (this.searchTerm) {
-                        const term = this.searchTerm.toLowerCase();
-                        filtered = filtered.filter(project => {
-                            const titleFr = (project.title_fr || '').toLowerCase();
-                            const titleEn = (project.title_en || '').toLowerCase();
-                            const descFr = (project.description_fr || '').toLowerCase();
-                            const descEn = (project.description_en || '').toLowerCase();
-                            const tech = (project.technologies || '').toLowerCase();
-                            
-                            return titleFr.includes(term) || titleEn.includes(term) || 
-                                   descFr.includes(term) || descEn.includes(term) || 
-                                   tech.includes(term);
-                        });
-                    }
-
-                    this.filteredProjects = filtered;
-                },
-
-                toggleLanguage() {
-                    this.currentLang = this.currentLang === 'fr' ? 'en' : 'fr';
-                    localStorage.setItem('preferred-language', this.currentLang);
+        // Progress bar functionality
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            if (!progressBar) return;
+            
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            
+            progressBar.style.width = scrollPercent + '%';
+        }
+        
+        // Load projects function
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                if (response.ok) {
+                    const data = await response.json();
+                    allProjects = data.projects || [];
+                } else {
+                    // Données d'exemple si l'API n'est pas disponible
+                    allProjects = [
+                        {
+                            id: 1,
+                            title_fr: "Portfolio Personnel",
+                            description_fr: "Site web portfolio moderne avec design responsive et animations fluides",
+                            technologies: "HTML, CSS, JavaScript, Tailwind",
+                            category: "Web",
+                            featured: true,
+                            github_url: "https://github.com/ServianB/portfolio",
+                            live_url: "https://benjamin-portfolio.com",
+                            image_url: null
+                        },
+                        {
+                            id: 2,
+                            title_fr: "Application E-commerce",
+                            description_fr: "Plateforme de vente en ligne complète avec système de paiement intégré",
+                            technologies: "React, Node.js, MongoDB, Stripe",
+                            category: "E-commerce",
+                            featured: true,
+                            github_url: "https://github.com/ServianB/ecommerce",
+                            live_url: null,
+                            image_url: null
+                        },
+                        {
+                            id: 3,
+                            title_fr: "Dashboard Analytics",
+                            description_fr: "Tableau de bord interactif pour visualiser et analyser des données complexes",
+                            technologies: "Vue.js, D3.js, Python, FastAPI",
+                            category: "Dashboard",
+                            featured: false,
+                            github_url: "https://github.com/ServianB/dashboard",
+                            live_url: "https://analytics-dashboard.com",
+                            image_url: null
+                        },
+                        {
+                            id: 4,
+                            title_fr: "Application Mobile",
+                            description_fr: "Application mobile native pour la gestion de tâches collaboratives",
+                            technologies: "React Native, Redux, Firebase",
+                            category: "Mobile",
+                            featured: true,
+                            github_url: "https://github.com/ServianB/mobile-app",
+                            live_url: null,
+                            image_url: null
+                        },
+                        {
+                            id: 5,
+                            title_fr: "API REST",
+                            description_fr: "API robuste et sécurisée pour un système de gestion de contenu",
+                            technologies: "Node.js, Express, PostgreSQL, JWT",
+                            category: "API",
+                            featured: false,
+                            github_url: "https://github.com/ServianB/cms-api",
+                            live_url: null,
+                            image_url: null
+                        },
+                        {
+                            id: 6,
+                            title_fr: "Site Web Corporate",
+                            description_fr: "Site vitrine professionnel avec CMS personnalisé pour une entreprise",
+                            technologies: "PHP, Laravel, MySQL, Bootstrap",
+                            category: "Web",
+                            featured: false,
+                            github_url: null,
+                            live_url: "https://corporate-website.com",
+                            image_url: null
+                        }
+                    ];
                 }
+                
+                updateStats();
+                filterProjects();
+                displayProjects();
+                
+            } catch (error) {
+                console.error('Erreur lors du chargement des projets:', error);
+                // Utiliser les données d'exemple en cas d'erreur
+                loadProjects();
             }
         }
+
+        // Update statistics
+        function updateStats() {
+            const totalElement = document.getElementById('total-projects');
+            const featuredElement = document.getElementById('featured-projects');
+            const displayedElement = document.getElementById('displayed-projects');
+            
+            if (totalElement) totalElement.textContent = allProjects.length;
+            if (featuredElement) {
+                const featuredCount = allProjects.filter(p => p.featured).length;
+                featuredElement.textContent = featuredCount;
+            }
+            if (displayedElement) displayedElement.textContent = filteredProjects.length;
+        }
+
+        // Filter projects
+        function filterProjects() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const selectedCategory = document.getElementById('categoryFilter')?.value || '';
+            
+            filteredProjects = allProjects.filter(project => {
+                // Filter by category
+                const categoryMatch = !selectedCategory || project.category === selectedCategory;
+                
+                // Filter by search term
+                const searchMatch = !searchTerm || 
+                    project.title_fr.toLowerCase().includes(searchTerm) ||
+                    project.description_fr.toLowerCase().includes(searchTerm) ||
+                    project.technologies.toLowerCase().includes(searchTerm);
+                
+                return categoryMatch && searchMatch;
+            });
+            
+            updateStats();
+            displayProjects();
+        }
+
+        // Display projects
+        function displayProjects() {
+            const container = document.getElementById('all-projects-container');
+            const noProjectsMsg = document.getElementById('no-projects-message');
+            
+            if (!container) return;
+            
+            if (filteredProjects.length === 0) {
+                container.innerHTML = '';
+                noProjectsMsg?.classList.remove('hidden');
+                return;
+            }
+            
+            noProjectsMsg?.classList.add('hidden');
+            
+            container.innerHTML = filteredProjects.map(project => `
+                <div class="project-card bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                    <div class="relative">
+                        ${project.image_url ? 
+                            `<img src="${project.image_url}" alt="${project.title_fr}" class="w-full h-48 object-cover">` :
+                            `<div class="w-full h-48 gradient-primary flex items-center justify-center">
+                                <i class="fas fa-code text-4xl text-white"></i>
+                            </div>`
+                        }
+                        <div class="absolute top-4 right-4 space-x-2">
+                            <span class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                ${project.category || 'Web'}
+                            </span>
+                            ${project.featured ? 
+                                `<span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                    <i class="fas fa-star"></i>
+                                </span>` : ''
+                            }
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary-800 mb-3">${project.title_fr}</h3>
+                        <p class="text-primary-600 mb-4 line-clamp-3">${project.description_fr}</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${project.technologies.split(',').slice(0, 3).map(tech => 
+                                `<span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-sm">${tech.trim()}</span>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <a href="project.html?id=${project.id}" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                                Voir le projet →
+                            </a>
+                            <div class="space-x-2">
+                                ${project.github_url ? 
+                                    `<a href="${project.github_url}" target="_blank" class="text-primary-400 hover:text-primary-600 transition-colors">
+                                        <i class="fab fa-github text-lg"></i>
+                                    </a>` : ''
+                                }
+                                ${project.live_url ? 
+                                    `<a href="${project.live_url}" target="_blank" class="text-primary-400 hover:text-primary-600 transition-colors">
+                                        <i class="fas fa-external-link-alt text-lg"></i>
+                                    </a>` : ''
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Load projects
+            loadProjects();
+            
+            // Add scroll listener for progress bar
+            window.addEventListener('scroll', updateProgressBar);
+            updateProgressBar();
+        });
     </script>
 
     <style>
         .line-clamp-3 {
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            animation: float 3s ease-in-out infinite;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .scroll-indicator i {
+            display: block;
+            margin: 0 auto 0.5rem auto;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-20px); }
         }
     </style>
 </body>

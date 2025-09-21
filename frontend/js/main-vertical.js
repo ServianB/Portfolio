@@ -73,6 +73,21 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', updateActiveDot);
     updateActiveDot(); // Initial call
 
+    // Progress bar functionality
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progress-bar');
+        if (!progressBar) return;
+        
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / scrollHeight) * 100;
+        
+        progressBar.style.width = scrollPercent + '%';
+    }
+    
+    window.addEventListener('scroll', updateProgressBar);
+    updateProgressBar(); // Initial call
+
     // Load projects dynamically (if the API is available)
     async function loadProjects() {
         try {
