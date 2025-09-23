@@ -29,6 +29,14 @@ function adminPanel() {
             featured: false
         },
         
+        // Change password form
+        passwordForm: {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+        },
+        passwordError: '',
+        
         // Messages
         message: '',
         messageType: 'success',
@@ -49,6 +57,12 @@ function adminPanel() {
         // Authentication
         async login() {
             try {
+                // Validation côté client
+                if (!this.credentials.username || !this.credentials.password) {
+                    this.loginError = 'Veuillez remplir tous les champs';
+                    return;
+                }
+
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
@@ -62,11 +76,30 @@ function adminPanel() {
                 if (response.ok) {
                     this.authenticated = true;
                     this.loginError = '';
+                    
+                    // Stocker le token de session si fourni
+                    if (data.token) {
+                        sessionStorage.setItem('admin_token', data.token);
+                    }
                     sessionStorage.setItem('admin_auth', 'authenticated');
+                    sessionStorage.setItem('admin_user', JSON.stringify(data.user));
+                    
                     this.loadProjects();
                     this.showMessage('Connexion réussie !', 'success');
                 } else {
-                    this.loginError = data.error || 'Erreur de connexion';
+                    // Gestion des différents types d'erreurs
+                    if (response.status === 423) {
+                        this.loginError = data.error; // Compte verrouillé
+                    } else if (response.status === 429) {
+                        this.loginError = data.error; // Rate limiting
+                    } else if (response.status === 401) {
+                        this.loginError = data.error || 'Identifiants invalides';
+                        if (data.attemptsRemaining !== undefined) {
+                            this.loginError += ` (${data.attemptsRemaining} tentatives restantes)`;
+                        }
+                    } else {
+                        this.loginError = data.error || 'Erreur de connexion';
+                    }
                 }
             } catch (error) {
                 console.error('Erreur de connexion:', error);
@@ -77,8 +110,62 @@ function adminPanel() {
         logout() {
             this.authenticated = false;
             sessionStorage.removeItem('admin_auth');
+            sessionStorage.removeItem('admin_token');
+            sessionStorage.removeItem('admin_user');
             this.credentials = { username: '', password: '' };
             this.showMessage('Déconnexion réussie', 'success');
+        },
+
+        // Change password
+        async changePassword() {
+            try {
+                // Validation côté client
+                if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
+                    this.passwordError = 'Veuillez remplir tous les champs';
+                    return;
+                }
+
+                if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+                    this.passwordError = 'Les nouveaux mots de passe ne correspondent pas';
+                    return;
+                }
+
+                if (this.passwordForm.newPassword.length < 8) {
+                    this.passwordError = 'Le nouveau mot de passe doit contenir au moins 8 caractères';
+                    return;
+                }
+
+                const user = JSON.parse(sessionStorage.getItem('admin_user') || '{}');
+                
+                const response = await fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: user.username,
+                        currentPassword: this.passwordForm.currentPassword,
+                        newPassword: this.passwordForm.newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.passwordError = '';
+                    this.passwordForm = {
+                        currentPassword: '',
+                        newPassword: '',
+                        confirmPassword: ''
+                    };
+                    this.showMessage('Mot de passe changé avec succès !', 'success');
+                } else {
+                    this.passwordError = data.error || 'Erreur lors du changement de mot de passe';
+                }
+            } catch (error) {
+                console.error('Erreur lors du changement de mot de passe:', error);
+                this.passwordError = 'Erreur de connexion au serveur';
+            }
         },
 
         // Projects management
