@@ -5,21 +5,26 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "node backend/server.js",
-    "build": "echo 'Build completed'",
-    "vercel-build": "echo 'Vercel build completed'"
+    "dev": "nodemon backend/server.js",
+    "build": "npm install",
+    "postinstall": "node backend/create-admin.js"
   },
   "keywords": ["portfolio", "nodejs", "express", "tailwind", "javascript"],
   "author": "Benjamin Servian <benjamin.servian.pro@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "dependencies": {
     "express": "^4.18.2",
     "sqlite3": "^5.1.6",
     "multer": "^1.4.5-lts.1",
     "cors": "^2.8.5",
-    "bcrypt": "^5.1.0"
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

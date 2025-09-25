@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -62,20 +63,67 @@ app.use('/api/login', (req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, '../frontend')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Ajouter les endpoints de healthcheck pour Railway
+try {
+  const createHealthCheck = require('../config/healthcheck.js');
+  createHealthCheck(app);
+  console.log('✅ Healthcheck endpoints configurés');
+} catch (error) {
+  console.log('⚠️  Healthcheck non configuré (fichier manquant)');
+}
 
 // Configuration multer pour upload d'images
+const uploadDir = path.join(__dirname, 'uploads');
+
+// Créer le répertoire uploads s'il n'existe pas
+if (!fs.existsSync(uploadDir)) {
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log(`📁 Répertoire uploads créé: ${uploadDir}`);
+  } catch (error) {
+    console.error('Erreur lors de la création du répertoire uploads:', error);
+  }
+}
+
+// Servir les fichiers statiques du dossier uploads
+app.use('/uploads', express.static(uploadDir));
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
-    cb(null, uploadPath);
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
+    // Nettoyer le nom de fichier pour éviter les caractères problématiques
+    const cleanFileName = file.originalname
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+      .replace(/[^a-zA-Z0-9.\-_]/g, '_'); // Remplacer les caractères spéciaux
+    
+    const fileName = Date.now() + '-' + cleanFileName;
+    console.log(`📷 Upload fichier: ${fileName}`);
+    cb(null, fileName);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Limite à 5MB
+  },
+  fileFilter: function (req, file, cb) {
+    // Vérifier le type de fichier
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Seuls les fichiers d\'image sont autorisés (JPEG, PNG, GIF, WebP)'));
+    }
+  }
+});
 
 // Initialisation de la base de données
 const dbPath = isVercel ? '/tmp/portfolio.db' : './portfolio.db';
@@ -266,62 +314,158 @@ app.get('/api/projects/:id', (req, res) => {
 });
 
 // Créer un nouveau projet
-app.post('/api/projects', upload.single('image'), (req, res) => {
-  const {
-    title_fr, title_en, description_fr, description_en,
-    technologies, github_url, live_url, category, featured
-  } = req.body;
-  
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-  
-  const query = `INSERT INTO projects 
-    (title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featured)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  
-  // Convertir featured en nombre (0 ou 1)
-  const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
-  const params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featuredValue];
-  
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
+app.post('/api/projects', (req, res) => {
+  // Utiliser upload avec gestion d'erreur
+  upload.single('image')(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      console.error('Erreur Multer:', err);
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'Fichier trop volumineux. Taille maximale: 5MB' });
+      }
+      return res.status(400).json({ error: 'Erreur lors de l\'upload: ' + err.message });
+    } else if (err) {
+      console.error('Erreur upload:', err);
+      return res.status(400).json({ error: err.message });
     }
-    res.json({ message: 'Project created successfully', id: this.lastID });
+
+    // Validation des champs requis
+    const {
+      title_fr, title_en, description_fr, description_en,
+      technologies, github_url, live_url, image_url, category, featured
+    } = req.body;
+
+    if (!title_fr || !title_en || !description_fr || !description_en || !technologies || !category) {
+      // Supprimer le fichier uploadé si validation échoue
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis' });
+    }
+    
+    // Prioriser le fichier uploadé, sinon utiliser l'URL fournie
+    let finalImageUrl = null;
+    if (req.file) {
+      finalImageUrl = `/uploads/${req.file.filename}`;
+    } else if (image_url && image_url.trim()) {
+      finalImageUrl = image_url.trim();
+    }
+    
+    const query = `INSERT INTO projects 
+      (title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    // Convertir featured en nombre (0 ou 1)
+    const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
+    const params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, finalImageUrl, category, featuredValue];
+    
+    db.run(query, params, function(err) {
+      if (err) {
+        console.error('Erreur base de données lors de la création du projet:', err);
+        
+        // Supprimer le fichier uploadé en cas d'erreur de base de données
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        
+        res.status(400).json({ error: 'Erreur lors de la création du projet: ' + err.message });
+        return;
+      }
+      
+      console.log(`✅ Projet créé avec succès (ID: ${this.lastID})`);
+      res.json({ 
+        message: 'Projet créé avec succès', 
+        id: this.lastID,
+        image_url: finalImageUrl 
+      });
+    });
   });
 });
 
 // Mettre à jour un projet
-app.put('/api/projects/:id', upload.single('image'), (req, res) => {
+app.put('/api/projects/:id', (req, res) => {
   const id = req.params.id;
-  const {
-    title_fr, title_en, description_fr, description_en,
-    technologies, github_url, live_url, category, featured
-  } = req.body;
   
-  let query = `UPDATE projects SET 
-    title_fr = ?, title_en = ?, description_fr = ?, description_en = ?,
-    technologies = ?, github_url = ?, live_url = ?, category = ?, featured = ?,
-    updated_at = CURRENT_TIMESTAMP`;
-  
-  // Convertir featured en nombre (0 ou 1)
-  const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
-  let params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, category, featuredValue];
-  
-  if (req.file) {
-    query += ', image_url = ?';
-    params.push(`/uploads/${req.file.filename}`);
-  }
-  
-  query += ' WHERE id = ?';
-  params.push(id);
-  
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
+  // Utiliser upload avec gestion d'erreur
+  upload.single('image')(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      console.error('Erreur Multer:', err);
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'Fichier trop volumineux. Taille maximale: 5MB' });
+      }
+      return res.status(400).json({ error: 'Erreur lors de l\'upload: ' + err.message });
+    } else if (err) {
+      console.error('Erreur upload:', err);
+      return res.status(400).json({ error: err.message });
     }
-    res.json({ message: 'Project updated successfully' });
+
+    const {
+      title_fr, title_en, description_fr, description_en,
+      technologies, github_url, live_url, image_url, category, featured
+    } = req.body;
+
+    // Validation des champs requis
+    if (!title_fr || !title_en || !description_fr || !description_en || !technologies || !category) {
+      // Supprimer le fichier uploadé si validation échoue
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis' });
+    }
+    
+    let query = `UPDATE projects SET 
+      title_fr = ?, title_en = ?, description_fr = ?, description_en = ?,
+      technologies = ?, github_url = ?, live_url = ?, category = ?, featured = ?,
+      updated_at = CURRENT_TIMESTAMP`;
+    
+    // Convertir featured en nombre (0 ou 1)
+    const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
+    let params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, category, featuredValue];
+    
+    // Déterminer l'URL de l'image finale
+    let finalImageUrl = null;
+    if (req.file) {
+      // Fichier uploadé - prioriser sur l'URL
+      finalImageUrl = `/uploads/${req.file.filename}`;
+      query += ', image_url = ?';
+      params.push(finalImageUrl);
+    } else if (image_url !== undefined) {
+      // URL fournie dans le body (peut être vide pour supprimer l'image)
+      finalImageUrl = image_url.trim() || null;
+      query += ', image_url = ?';
+      params.push(finalImageUrl);
+    }
+    // Si ni fichier ni image_url dans le body, garder l'image existante
+    
+    query += ' WHERE id = ?';
+    params.push(id);
+    
+    db.run(query, params, function(err) {
+      if (err) {
+        console.error('Erreur base de données lors de la mise à jour du projet:', err);
+        
+        // Supprimer le fichier uploadé en cas d'erreur de base de données
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        
+        res.status(400).json({ error: 'Erreur lors de la mise à jour du projet: ' + err.message });
+        return;
+      }
+      
+      if (this.changes === 0) {
+        // Supprimer le fichier uploadé si aucun projet n'a été trouvé
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        return res.status(404).json({ error: 'Projet non trouvé' });
+      }
+      
+      console.log(`✅ Projet mis à jour avec succès (ID: ${id})`);
+      res.json({ 
+        message: 'Projet mis à jour avec succès',
+        image_url: finalImageUrl
+      });
+    });
   });
 });
 
