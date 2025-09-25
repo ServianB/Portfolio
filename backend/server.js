@@ -64,39 +64,57 @@ app.use('/api/login', (req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, '../frontend')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configuration des fichiers statiques selon l'environnement
+if (isProduction) {
+  app.use('/uploads', express.static('/tmp/uploads'));
+} else {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 // Configuration multer pour upload d'images
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = isProduction ? '/tmp/uploads' : path.join(__dirname, 'uploads');
-    
-    // Créer le répertoire s'il n'existe pas
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
-  }
-});
+let upload;
 
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
-  },
-  fileFilter: (req, file, cb) => {
-    // Vérifier que c'est bien une image
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Le fichier doit être une image'), false);
+if (isProduction && process.env.CLOUDINARY_CLOUD_NAME) {
+  // Utiliser Cloudinary en production
+  const { upload: cloudinaryUpload } = require('./cloudinary-config');
+  upload = cloudinaryUpload;
+  console.log('📁 Utilisation de Cloudinary pour le stockage des images');
+} else {
+  // Utiliser le stockage local en développement
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const uploadPath = isProduction ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+      
+      // Créer le répertoire s'il n'existe pas
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      
+      cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname)
     }
-  }
-});
+  });
+
+  upload = multer({ 
+    storage: storage,
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+    },
+    fileFilter: (req, file, cb) => {
+      // Vérifier que c'est bien une image
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Le fichier doit être une image'), false);
+      }
+    }
+  });
+  
+  console.log('📁 Utilisation du stockage local pour les images');
+}
 
 // Initialisation de la base de données
 const dbPath = isProduction ? '/tmp/portfolio.db' : './portfolio.db';
@@ -312,7 +330,17 @@ app.post('/api/projects', upload.single('image'), (req, res) => {
       });
     }
     
-    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    // Gérer l'URL de l'image selon le type de stockage
+    let image_url = null;
+    if (req.file) {
+      if (req.file.path) {
+        // Cloudinary retourne l'URL complète dans req.file.path
+        image_url = req.file.path;
+      } else {
+        // Stockage local
+        image_url = `/uploads/${req.file.filename}`;
+      }
+    }
     
     const query = `INSERT INTO projects 
       (title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featured)
@@ -358,7 +386,14 @@ app.put('/api/projects/:id', upload.single('image'), (req, res) => {
   
   if (req.file) {
     query += ', image_url = ?';
-    params.push(`/uploads/${req.file.filename}`);
+    // Gérer l'URL de l'image selon le type de stockage
+    if (req.file.path) {
+      // Cloudinary retourne l'URL complète dans req.file.path
+      params.push(req.file.path);
+    } else {
+      // Stockage local
+      params.push(`/uploads/${req.file.filename}`);
+    }
   }
   
   query += ' WHERE id = ?';
