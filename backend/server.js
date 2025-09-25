@@ -67,7 +67,6 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuration multer pour upload d'images
-const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = isProduction ? '/tmp/uploads' : path.join(__dirname, 'uploads');
