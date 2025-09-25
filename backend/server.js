@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 // Configuration pour Railway
 const isProduction = process.env.NODE_ENV === 'production';
 const isRailway = process.env.RAILWAY_ENVIRONMENT === 'production';
-
+const isDev = !isProduction;
 
 // Middleware
 app.use(cors());
@@ -68,7 +68,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Configuration multer pour upload d'images
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+    const uploadPath = isProduction ? '/tmp/uploads' : path.join(__dirname, 'uploads');
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
@@ -79,7 +79,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Initialisation de la base de données
-const dbPath = isVercel ? '/tmp/portfolio.db' : './portfolio.db';
+const dbPath = isProduction ? '/tmp/portfolio.db' : './portfolio.db';
 const db = new sqlite3.Database(dbPath);
 
 // Création des tables
@@ -485,12 +485,19 @@ app.get('/project/:id', (req, res) => {
 });
 
 // Démarrage du serveur
-if (isDev && !isVercel) {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend: http://localhost:${PORT}`);
-    console.log(`Admin: http://localhost:${PORT}/admin`);
-  });
-}
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Frontend: http://localhost:${PORT}`);
+  console.log(`⚙️ Admin: http://localhost:${PORT}/admin`);
+  console.log(`🔒 Passwords are secured with bcrypt`);
+  
+  if (isProduction) {
+    console.log('🔥 Running in production mode');
+  }
+  
+  if (isRailway) {
+    console.log('🚄 Deployed on Railway');
+  }
+});
 
 module.exports = app;
