@@ -318,22 +318,22 @@
         let allProjects = [];
         let filteredProjects = [];
         
-        // Mobile menu functions
+        // Mobile menu management
+        const mobileMenu = document.getElementById('mobile-menu');
         function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('hidden');
         }
 
         // Progress bar functionality
+        const progressBar = document.getElementById('progress-bar');
         function updateProgressBar() {
-            const progressBar = document.getElementById('progress-bar');
             if (!progressBar) return;
             
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
             const scrollPercent = (scrollTop / scrollHeight) * 100;
             
-            progressBar.style.width = scrollPercent + '%';
+            progressBar.style.width = `${scrollPercent}%`;
         }
         
         // Load projects function
@@ -498,8 +498,7 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-primary-800 mb-3">${project.title_fr}</h3>
-                        <p class="text-primary-600 mb-4 line-clamp-3">${project.description_fr}</p>
+                        <h3 class="text-xl font-bold text-primary-800 mb-4">${project.title_fr}</h3>
                         
                         <div class="flex flex-wrap gap-2 mb-4">
                             ${project.technologies.split(',').slice(0, 3).map(tech => 

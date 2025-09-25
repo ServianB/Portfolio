@@ -2,16 +2,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Portfolio vertical initialisé');
     
-    // Mobile menu functions
-    window.toggleMobileMenu = function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    };
+    // Mobile menu management
+    const mobileMenu = document.getElementById('mobile-menu');
     
-    window.closeMobileMenu = function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.add('hidden');
-    };
+    window.toggleMobileMenu = () => mobileMenu.classList.toggle('hidden');
+    window.closeMobileMenu = () => mobileMenu.classList.add('hidden');
     
     // Intersection Observer for animations
     const observerOptions = {
@@ -27,10 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
-    // Observer all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-        observer.observe(el);
-    });
+    // Observe all elements with animate-on-scroll class
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -46,26 +39,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Update active navigation dot based on scroll position
+    // Navigation dot management
+    const sections = document.querySelectorAll('section[id]');
+    const navDots = document.querySelectorAll('.nav-dot');
+    const sectionIds = ['intro', 'home', 'about', 'projects', 'contact'];
+    
     function updateActiveDot() {
-        const sections = document.querySelectorAll('section[id]');
-        const navDots = document.querySelectorAll('.nav-dot');
-        
         let current = '';
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
             if (pageYOffset >= sectionTop - 200) {
                 current = section.getAttribute('id');
             }
         });
 
         navDots.forEach((dot, index) => {
-            dot.classList.remove('active');
-            const sectionIds = ['intro', 'home', 'about', 'projects', 'contact'];
-            if (sectionIds[index] === current) {
-                dot.classList.add('active');
-            }
+            dot.classList.toggle('active', sectionIds[index] === current);
         });
     }
 
@@ -74,74 +63,75 @@ document.addEventListener('DOMContentLoaded', function() {
     updateActiveDot(); // Initial call
 
     // Progress bar functionality
+    const progressBar = document.getElementById('progress-bar');
+    
     function updateProgressBar() {
-        const progressBar = document.getElementById('progress-bar');
         if (!progressBar) return;
         
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollPercent = (scrollTop / scrollHeight) * 100;
         
-        progressBar.style.width = scrollPercent + '%';
+        progressBar.style.width = `${scrollPercent}%`;
     }
     
     window.addEventListener('scroll', updateProgressBar);
     updateProgressBar(); // Initial call
 
-    // Load projects dynamically (if the API is available)
+    // Load projects dynamically
     async function loadProjects() {
         try {
             const response = await fetch('/api/projects?featured=true');
             if (response.ok) {
                 const data = await response.json();
                 displayProjects(data.projects || []);
+                return;
             }
         } catch (error) {
             console.log('API non disponible:', error);
-            displaySampleProjects();
         }
+        displaySampleProjects();
     }
 
     function displayProjects(projects) {
         const container = document.getElementById('projects-container');
         if (!container) return;
 
-        container.innerHTML = projects.map(project => `
-            <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
-                ${project.image_url ? `
-                    <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative overflow-hidden">
-                        <img src="${project.image_url}" alt="${project.title_fr}" class="w-full h-full object-cover">
-                    </div>
-                ` : `
-                    <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <i class="fas fa-code text-white text-4xl"></i>
-                    </div>
-                `}
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-primary-900 mb-2">${project.title_fr}</h3>
-                    <p class="text-primary-600 text-sm mb-4">${project.description_fr}</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        ${project.technologies ? project.technologies.split(',').map(tech => 
-                            `<span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">${tech.trim()}</span>`
-                        ).join('') : ''}
-                    </div>
-                    <div class="flex space-x-3">
-                        ${project.github_url ? `
-                            <a href="${project.github_url}" target="_blank" class="flex items-center text-primary-600 hover:text-accent-500 transition-colors">
-                                <i class="fab fa-github mr-1"></i>
-                                Code
-                            </a>
-                        ` : ''}
-                        ${project.live_url ? `
-                            <a href="${project.live_url}" target="_blank" class="flex items-center text-primary-600 hover:text-accent-500 transition-colors">
-                                <i class="fas fa-external-link-alt mr-1"></i>
-                                Demo
-                            </a>
-                        ` : ''}
+        const createProjectCard = (project) => {
+            const imageSection = project.image_url 
+                ? `<div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative overflow-hidden">
+                     <img src="${project.image_url}" alt="${project.title_fr}" class="w-full h-full object-cover">
+                   </div>`
+                : `<div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                     <i class="fas fa-code text-white text-4xl"></i>
+                   </div>`;
+
+            const technologies = project.technologies 
+                ? project.technologies.split(',').map(tech => 
+                    `<span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">${tech.trim()}</span>`
+                  ).join('')
+                : '';
+
+            const links = [
+                project.github_url ? `<a href="${project.github_url}" target="_blank" class="flex items-center text-primary-600 hover:text-accent-500 transition-colors">
+                                        <i class="fab fa-github mr-1"></i>Code</a>` : '',
+                project.live_url ? `<a href="${project.live_url}" target="_blank" class="flex items-center text-primary-600 hover:text-accent-500 transition-colors">
+                                      <i class="fas fa-external-link-alt mr-1"></i>Demo</a>` : ''
+            ].filter(link => link).join('');
+
+            return `
+                <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+                    ${imageSection}
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary-900 mb-4">${project.title_fr}</h3>
+                        <div class="flex flex-wrap gap-2 mb-4">${technologies}</div>
+                        <div class="flex space-x-3">${links}</div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        };
+
+        container.innerHTML = projects.map(createProjectCard).join('');
     }
 
     function displaySampleProjects() {
@@ -155,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 image_url: null
             },
             {
-                title_fr: "Application E-commerce",
+                title_fr: "Application E-commerce", 
                 description_fr: "Plateforme de vente en ligne avec panier et gestion des commandes",
                 technologies: "React, Node.js, MongoDB",
                 github_url: "#",
@@ -174,6 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
         displayProjects(sampleProjects);
     }
 
-    // Load projects on page load
+    // Initialize everything
     loadProjects();
 });

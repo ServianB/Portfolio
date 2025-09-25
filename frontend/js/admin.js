@@ -25,6 +25,7 @@ function adminPanel() {
             technologies: '',
             github_url: '',
             live_url: '',
+            image_url: '',
             category: '',
             featured: false
         },
@@ -41,7 +42,8 @@ function adminPanel() {
         message: '',
         messageType: 'success',
         
-        // File upload
+        // Image handling
+        imageMode: 'upload', // 'upload' ou 'url'
         selectedFile: null,
 
         // Initialization
@@ -182,34 +184,49 @@ function adminPanel() {
 
         async saveProject() {
             try {
-                const formData = new FormData();
-                
-                // Add all form fields
-                Object.keys(this.projectForm).forEach(key => {
-                    if (key !== 'id' && this.projectForm[key] !== null) {
-                        // Gestion spéciale pour les booléens
-                        if (key === 'featured') {
-                            formData.append(key, this.projectForm[key] ? '1' : '0');
-                        } else {
-                            formData.append(key, this.projectForm[key]);
-                        }
-                    }
-                });
-
-                // Add file if selected
-                if (this.selectedFile) {
-                    formData.append('image', this.selectedFile);
-                }
-
                 const url = this.editingProject ? 
                     `/api/projects/${this.editingProject.id}` : 
                     '/api/projects';
                 
                 const method = this.editingProject ? 'PUT' : 'POST';
+                let requestData;
+                let headers = {};
+
+                if (this.imageMode === 'upload' && this.selectedFile) {
+                    // Mode upload - utiliser FormData
+                    requestData = new FormData();
+                    
+                    // Ajouter tous les champs du formulaire
+                    Object.keys(this.projectForm).forEach(key => {
+                        if (key !== 'id' && this.projectForm[key] !== null) {
+                            if (key === 'featured') {
+                                requestData.append(key, this.projectForm[key] ? '1' : '0');
+                            } else {
+                                requestData.append(key, this.projectForm[key] || '');
+                            }
+                        }
+                    });
+                    
+                    // Ajouter le fichier
+                    requestData.append('image', this.selectedFile);
+                    
+                } else {
+                    // Mode URL ou pas d'image - utiliser JSON
+                    const projectData = { ...this.projectForm };
+                    projectData.featured = projectData.featured ? 1 : 0;
+                    
+                    if (!this.editingProject) {
+                        delete projectData.id;
+                    }
+                    
+                    requestData = JSON.stringify(projectData);
+                    headers['Content-Type'] = 'application/json';
+                }
 
                 const response = await fetch(url, {
                     method: method,
-                    body: formData
+                    headers: headers,
+                    body: requestData
                 });
 
                 const data = await response.json();
@@ -244,11 +261,20 @@ function adminPanel() {
                 technologies: project.technologies,
                 github_url: project.github_url || '',
                 live_url: project.live_url || '',
+                image_url: project.image_url || '',
                 category: project.category,
                 featured: Boolean(project.featured)
             };
-            this.activeTab = 'add-project';
+            
+            // Déterminer le mode d'image basé sur l'URL existante
+            if (project.image_url && project.image_url.startsWith('/uploads/')) {
+                this.imageMode = 'upload'; // Fichier uploadé précédemment
+            } else {
+                this.imageMode = 'url'; // URL externe ou pas d'image
+            }
+            
             this.selectedFile = null;
+            this.activeTab = 'add-project';
         },
 
         async deleteProject(projectId) {
@@ -286,9 +312,11 @@ function adminPanel() {
                 technologies: '',
                 github_url: '',
                 live_url: '',
+                image_url: '',
                 category: '',
                 featured: false
             };
+            this.imageMode = 'upload';
             this.selectedFile = null;
             
             // Reset file input
@@ -298,13 +326,14 @@ function adminPanel() {
             }
         },
 
+        // Image handling methods
         handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
                 // Validate file type
-                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
                 if (!validTypes.includes(file.type)) {
-                    this.showMessage('Type de fichier non supporté. Utilisez JPG, PNG ou WebP.', 'error');
+                    this.showMessage('Type de fichier non supporté. Utilisez JPG, PNG, WebP ou GIF.', 'error');
                     event.target.value = '';
                     return;
                 }
@@ -318,7 +347,26 @@ function adminPanel() {
                 }
 
                 this.selectedFile = file;
+                // Clear URL when file is selected
+                this.projectForm.image_url = '';
             }
+        },
+
+        clearSelectedFile() {
+            this.selectedFile = null;
+            const fileInput = document.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+        },
+
+        getImagePreviewUrl() {
+            if (this.imageMode === 'upload' && this.selectedFile) {
+                return URL.createObjectURL(this.selectedFile);
+            } else if (this.imageMode === 'url' && this.projectForm.image_url) {
+                return this.projectForm.image_url;
+            }
+            return null;
         },
 
         // Utility functions

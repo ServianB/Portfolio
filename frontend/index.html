@@ -55,7 +55,7 @@
         }
     </script>
     <style>
-        /* Custom styles for horizontal scrolling */
+        /* Base styles */
         body {
             font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
@@ -68,11 +68,11 @@
             transition: all 0.6s ease-in-out;
         }
         
-        /* Transitions fluides entre sections */
-        section::before {
+        /* Smooth transitions between sections */
+        section::before,
+        section::after {
             content: '';
             position: absolute;
-            top: 0;
             left: 0;
             right: 0;
             height: 50px;
@@ -80,15 +80,13 @@
             pointer-events: none;
         }
         
+        section::before {
+            top: 0;
+        }
+        
         section::after {
-            content: '';
-            position: absolute;
             bottom: 0;
-            left: 0;
-            right: 0;
-            height: 50px;
             background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);
-            pointer-events: none;
         }
         
         /* Custom animations */
@@ -139,7 +137,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
-        /* Responsive adjustments */
+        /* Responsive design */
         @media (max-width: 768px) {
             .horizontal-container {
                 flex-direction: column;
@@ -186,18 +184,10 @@
             background: linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%);
         }
         
-        /* Gradients harmonieux pour les icônes */
-        .gradient-icon-1 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .gradient-icon-2 {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        
-        .gradient-icon-3 {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        }
+        /* Icon gradients */
+        .gradient-icon-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-icon-2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .gradient-icon-3 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
         
         /* Barre de progression harmonieuse */
         .progress-bar {
@@ -210,20 +200,18 @@
             transition: width 0.3s ease;
         }
         
-        /* Amélioration de l'harmonie visuelle */
+        /* Enhanced scroll and social links styles */
         .scroll-smooth-enhanced {
             scroll-behavior: smooth;
             scroll-padding-top: 2rem;
         }
 
-        /* Écriture verticale pour les réseaux sociaux */
         .writing-vertical {
             writing-mode: vertical-lr;
             text-orientation: mixed;
             transform: rotate(180deg);
         }
 
-        /* Traits de séparation verticaux */
         .vertical-separator {
             width: 1px;
             height: 40px;
@@ -231,7 +219,7 @@
             margin: 0 auto;
         }
 
-        /* Version mobile des réseaux sociaux */
+        /* Mobile social links */
         @media (max-width: 1024px) {
             .social-links-mobile {
                 position: fixed;
@@ -269,19 +257,19 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-12">
                     <a href="#intro" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
-                        <span>Intro</span>
+                        Intro
                     </a>
                     <a href="#home" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
-                        <span>Accueil</span>
+                        Accueil
                     </a>
                     <a href="#about" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
-                        <span>À propos</span>
+                        À propos
                     </a>
                     <a href="#projects" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
-                        <span>Projets</span>
+                        Projets
                     </a>
                     <a href="#contact" class="hover:text-accent-500 transition-colors font-medium text-primary-600">
-                        <span>Contact</span>
+                        Contact
                     </a>
                 </div>
 
@@ -296,19 +284,19 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-primary-200 shadow-lg">
             <div class="px-6 py-4 space-y-3">
                 <a href="#intro" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span>Intro</span>
+                    Intro
                 </a>
                 <a href="#home" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span>Accueil</span>
+                    Accueil
                 </a>
                 <a href="#about" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span>À propos</span>
+                    À propos
                 </a>
                 <a href="#projects" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span>Projets</span>
+                    Projets
                 </a>
                 <a href="#contact" onclick="closeMobileMenu()" class="block w-full text-left text-primary-600 hover:text-accent-500 py-2">
-                    <span>Contact</span>
+                    Contact
                 </a>
             </div>
         </div>
@@ -348,11 +336,11 @@
                         Benjamin Servian
                     </h1>
                     <p class="text-xl md:text-2xl font-light mb-12 opacity-90">
-                        <span>Développeur Fullstack</span>
+                        Développeur Fullstack
                     </p>
                     <a href="#home" 
                             class="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all duration-300 text-lg font-medium">
-                        <span>Commencer l'exploration</span>
+                        Commencer l'exploration
                         <i class="fas fa-arrow-right ml-3"></i>
                     </a>
                 </div>
@@ -385,10 +373,10 @@
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="animate-slide-in-left">
                     <h2 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-6">
-                        <span>Créateur d'expériences</span>
+                        Créateur d'expériences
                     </h2>
                     <p class="text-xl md:text-2xl text-primary-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                        <span>Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.</span>
+                        Je transforme les idées en solutions numériques innovantes, alliant créativité technique et excellence professionnelle.
                     </p>
                     <div class="grid md:grid-cols-3 gap-8 mt-12">
                         <div class="text-center p-6">
@@ -396,10 +384,10 @@
                                 <i class="fas fa-brain text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span>Développement Web</span>
+                                Développement Web
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span>Des sites pensés pour les clients</span>
+                                Des sites pensés pour les clients
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -407,10 +395,10 @@
                                 <i class="fas fa-code text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span>Développement mobile</span>
+                                Développement mobile
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span>Solutions Android & IOS</span>
+                                Solutions Android & IOS
                             </p>
                         </div>
                         <div class="text-center p-6">
@@ -418,10 +406,10 @@
                                 <i class="fas fa-rocket text-white text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-primary-800 mb-2">
-                                <span>Innovation</span>
+                                Innovation
                             </h3>
                             <p class="text-primary-600 text-sm">
-                                <span>Technologies de pointe</span>
+                                Technologies de pointe
                             </p>
                         </div>
                     </div>
@@ -435,10 +423,10 @@
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="animate-slide-in-left">
                         <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-800 mb-6">
-                            <span>À propos de moi</span>
+                            À propos de moi
                         </h2>
                         <p class="text-lg text-primary-800 mb-6 leading-relaxed text-justify">
-                            <span>Jeune diplomé d'une formation d'ingénieur informatique, je me lance dans la Freelance afin de pouvoir offrir mes compétences à des projets variés.<br>En parallèle, je m'intéresse et monte en expertises sur de nombreux domaines IT qui m'inspirent.<br>A travers ce portfolio, je souhaite mettre en avant mes compétences et mes futures réalisations.</span>
+                            Jeune diplomé d'une formation d'ingénieur informatique, je me lance dans la Freelance afin de pouvoir offrir mes compétences à des projets variés.<br>En parallèle, je m'intéresse et monte en expertises sur de nombreux domaines IT qui m'inspirent.<br>A travers ce portfolio, je souhaite mettre en avant mes compétences et mes futures réalisations.
                         </p>
                         
                         <!-- Skills Grid -->
@@ -503,10 +491,10 @@
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-6">
-                        <span>Projets Mis en Avant</span>
+                        Projets Mis en Avant
                     </h2>
                     <p class="text-lg text-primary-600 max-w-2xl mx-auto">
-                        <span>Découvrez une sélection de mes meilleurs projets professionnels et universitaires</span>
+                        Découvrez une sélection de mes meilleurs projets professionnels et universitaires
                     </p>
                 </div>
 
@@ -519,7 +507,7 @@
                 <div class="text-center mt-12 space-x-4 flex flex-wrap justify-center gap-4">
                     <a href="/projects" class="inline-flex items-center bg-accent-500 text-white px-6 py-3 rounded-full hover:bg-accent-600 transition-colors font-medium">
                         <i class="fas fa-folder-open mr-2"></i>
-                        <span>Tous les projets</span>
+                        Tous les projets
                     </a>
                 </div>
             </div>
@@ -530,10 +518,10 @@
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-display font-bold mb-6">
-                        <span>Contactez-moi</span>
+                        Contactez-moi
                     </h2>
                     <p class="text-lg opacity-90 max-w-2xl mx-auto">
-                        <span>N'hésitez pas à me contacter pour discuter de vos projets ou collaborations</span>
+                        N'hésitez pas à me contacter pour discuter de vos projets ou collaborations
                     </p>
                 </div>
 
@@ -603,7 +591,7 @@
                         </div>
                         <button type="submit" 
                                 class="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-xl hover:bg-white/30 transition-all duration-300 font-medium border border-white/20">
-                            <span>Envoyer le message</span>
+                            Envoyer le message
                             <i class="fas fa-paper-plane ml-2"></i>
                         </button>
                     </form>

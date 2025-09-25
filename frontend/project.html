@@ -231,9 +231,9 @@
                 <h1 class="text-5xl md:text-7xl font-display font-bold mb-6" id="project-title">
                     Chargement...
                 </h1>
-                <p class="text-xl md:text-2xl opacity-90 mb-8 max-w-3xl mx-auto leading-relaxed" id="project-description">
+                <!-- <p class="text-xl md:text-2xl opacity-90 mb-8 max-w-3xl mx-auto leading-relaxed" id="project-description">
                     Chargement de la description...
-                </p>
+                </p> -->
                 
                 <!-- Badges des technologies -->
                 <div class="flex flex-wrap justify-center gap-3 mb-8" id="project-technologies">
@@ -269,20 +269,11 @@
                         </div>
                         
                         <!-- Fonctionnalités principales -->
-                        <div class="mb-8">
-                            <h3 class="text-2xl font-semibold text-primary-800 mb-4">
-                                <span data-fr="Fonctionnalités principales" data-en="Key Features">Fonctionnalités principales</span>
-                            </h3>
-                            <ul class="space-y-3" id="project-features">
-                                <!-- Fonctionnalités seront ajoutées dynamiquement -->
-                            </ul>
-                        </div>
+
                         
                         <!-- Défis techniques -->
                         <div>
-                            <h3 class="text-2xl font-semibold text-primary-800 mb-4">
-                                <span data-fr="Défis techniques" data-en="Technical Challenges">Défis techniques</span>
-                            </h3>
+                            
                             <p class="text-primary-700 leading-relaxed" id="project-challenges">
                                 <!-- Défis seront ajoutés dynamiquement -->
                             </p>
@@ -509,20 +500,20 @@
                     github_url: "https://github.com/ServianB/ecommerce",
                     live_url: null,
                     image_url: null,
-                    features_fr: [
-                        "Catalogue de produits dynamique",
-                        "Panier de commandes intelligent",
-                        "Système de paiement sécurisé",
-                        "Interface administrateur"
-                    ],
-                    features_en: [
-                        "Dynamic product catalog",
-                        "Smart shopping cart",
-                        "Secure payment system",
-                        "Admin interface"
-                    ],
-                    challenges_fr: "La gestion des états complexes dans React et l'intégration sécurisée des paiements avec Stripe ont été les aspects les plus techniques de ce projet.",
-                    challenges_en: "Managing complex states in React and secure payment integration with Stripe were the most technical aspects of this project."
+                    // features_fr: [
+                    //     "Catalogue de produits dynamique",
+                    //     "Panier de commandes intelligent",
+                    //     "Système de paiement sécurisé",
+                    //     "Interface administrateur"
+                    // ],
+                    // features_en: [
+                    //     "Dynamic product catalog",
+                    //     "Smart shopping cart",
+                    //     "Secure payment system",
+                    //     "Admin interface"
+                    // ],
+                    // challenges_fr: "La gestion des états complexes dans React et l'intégration sécurisée des paiements avec Stripe ont été les aspects les plus techniques de ce projet.",
+                    // challenges_en: "Managing complex states in React and secure payment integration with Stripe were the most technical aspects of this project."
                 }
             };
             
@@ -541,7 +532,7 @@
             const description = currentLanguage === 'fr' ? currentProject.description_fr : (currentProject.description_en || currentProject.description_fr);
             
             document.getElementById('project-title').textContent = title;
-            document.getElementById('project-description').textContent = description;
+            // document.getElementById('project-description').textContent = description;
             document.title = `${title} - Benjamin Portfolio`;
             
             // Update technologies
@@ -619,16 +610,16 @@
                 ).join('');
             }
             
-            // Update challenges
-            const challenges = currentLanguage === 'fr' ? 
-                (currentProject.challenges_fr || currentProject.challenges) :
-                (currentProject.challenges_en || currentProject.challenges);
+            // // Update challenges
+            // const challenges = currentLanguage === 'fr' ? 
+            //     (currentProject.challenges_fr || currentProject.challenges) :
+            //     (currentProject.challenges_en || currentProject.challenges);
                 
-            const defaultChallenges = currentLanguage === 'fr' ? 
-                "Ce projet m'a permis d'approfondir mes connaissances techniques et de relever plusieurs défis intéressants." :
-                "This project allowed me to deepen my technical knowledge and tackle several interesting challenges.";
+            // const defaultChallenges = currentLanguage === 'fr' ? 
+            //     "Ce projet m'a permis d'approfondir mes connaissances techniques et de relever plusieurs défis intéressants." :
+            //     "This project allowed me to deepen my technical knowledge and tackle several interesting challenges.";
                 
-            document.getElementById('project-challenges').textContent = challenges || defaultChallenges;
+            // document.getElementById('project-challenges').textContent = challenges || defaultChallenges;
             
             // Update project info
             const infoContainer = document.getElementById('project-info');
