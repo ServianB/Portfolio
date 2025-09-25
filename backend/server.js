@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -66,9 +67,16 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuration multer pour upload d'images
+const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = isProduction ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+    
+    // Créer le répertoire s'il n'existe pas
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
@@ -76,7 +84,20 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter: (req, file, cb) => {
+    // Vérifier que c'est bien une image
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Le fichier doit être une image'), false);
+    }
+  }
+});
 
 // Initialisation de la base de données
 const dbPath = isProduction ? '/tmp/portfolio.db' : './portfolio.db';
@@ -268,28 +289,55 @@ app.get('/api/projects/:id', (req, res) => {
 
 // Créer un nouveau projet
 app.post('/api/projects', upload.single('image'), (req, res) => {
-  const {
-    title_fr, title_en, description_fr, description_en,
-    technologies, github_url, live_url, category, featured
-  } = req.body;
-  
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-  
-  const query = `INSERT INTO projects 
-    (title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featured)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  
-  // Convertir featured en nombre (0 ou 1)
-  const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
-  const params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featuredValue];
-  
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
+  try {
+    console.log('Création d\'un nouveau projet - Body:', req.body);
+    console.log('Fichier uploadé:', req.file ? req.file.filename : 'Aucun fichier');
+    
+    const {
+      title_fr, title_en, description_fr, description_en,
+      technologies, github_url, live_url, category, featured
+    } = req.body;
+    
+    // Validation des champs requis
+    if (!title_fr || !title_en || !description_fr || !description_en || !technologies || !category) {
+      return res.status(400).json({ 
+        error: 'Champs requis manquants',
+        missing: {
+          title_fr: !title_fr,
+          title_en: !title_en,
+          description_fr: !description_fr,
+          description_en: !description_en,
+          technologies: !technologies,
+          category: !category
+        }
+      });
     }
-    res.json({ message: 'Project created successfully', id: this.lastID });
-  });
+    
+    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    
+    const query = `INSERT INTO projects 
+      (title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    // Convertir featured en nombre (0 ou 1)
+    const featuredValue = featured === '1' || featured === 1 || featured === true ? 1 : 0;
+    const params = [title_fr, title_en, description_fr, description_en, technologies, github_url, live_url, image_url, category, featuredValue];
+    
+    console.log('Paramètres de la requête SQL:', params);
+    
+    db.run(query, params, function(err) {
+      if (err) {
+        console.error('Erreur lors de l\'insertion:', err);
+        res.status(400).json({ error: err.message, details: err });
+        return;
+      }
+      console.log('Projet créé avec succès, ID:', this.lastID);
+      res.json({ message: 'Project created successfully', id: this.lastID });
+    });
+  } catch (error) {
+    console.error('Erreur dans la route POST /api/projects:', error);
+    res.status(500).json({ error: 'Erreur serveur', details: error.message });
+  }
 });
 
 // Mettre à jour un projet
@@ -482,6 +530,29 @@ app.get('/projects', (req, res) => {
 
 app.get('/project/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/project.html'));
+});
+
+// Middleware de gestion d'erreur global
+app.use((error, req, res, next) => {
+  console.error('Erreur globale:', error);
+  
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Le fichier est trop volumineux (5MB max)' });
+    }
+    return res.status(400).json({ error: 'Erreur d\'upload: ' + error.message });
+  }
+  
+  res.status(500).json({ 
+    error: 'Erreur serveur interne', 
+    message: error.message,
+    stack: isProduction ? undefined : error.stack 
+  });
+});
+
+// Middleware pour gérer les routes non trouvées
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route non trouvée' });
 });
 
 // Démarrage du serveur
